@@ -38,6 +38,18 @@ Esta es una API de Gestión de Proyectos estilo Kanban. Implementa un CRUD RESTf
 - **Borrado en Cascada**: Eliminar un Tablero (Board) debe eliminar automáticamente todas sus Columnas y Tickets asociados. Eliminar una Columna debe eliminar sus Tickets. Implementar esto usando hooks de Mongoose (ej. `pre('deleteOne')`).
 - **Idempotencia**: Los endpoints de actualización (como `PATCH` para mover un ticket) DEBEN ser idempotentes. Enviar la misma petición dos veces (debido a una falla de red) debe resultar en el mismo estado exacto en la base de datos sin duplicar datos o corromper el ordenamiento.
 
+## Especificación de Endpoints (Contrato de la API)
+El sistema debe exponer exactamente la siguiente estructura de rutas. Todo ticket debe nacer estrictamente dentro del contexto de una columna y un tablero.
+
+| Método | Endpoint | Acción | Código de Éxito |
+|---|---|---|---|
+| POST | `/api/boards` | Crea un nuevo tablero. | 201 Created |
+| GET | `/api/boards/:boardId` | Obtiene un tablero con sus columnas pobladas. | 200 OK |
+| POST | `/api/boards/:boardId/columns` | Agrega una columna a un tablero específico. | 201 Created |
+| DELETE | `/api/boards/:boardId/columns/:columnId` | Elimina una columna. | 204 No Content |
+| POST | `/api/boards/:boardId/columns/:columnId/tickets` | Crea un ticket dentro de una columna específica. | 201 Created |
+| PATCH | `/api/boards/:boardId/columns/:columnId/tickets/:ticketId` | Mueve un ticket o actualiza su contenido. | 200 OK |
+
 ## Pruebas y Contratos
-- La API está guiada por un contrato estricto de endpoints. Prueba tu código usando Postman o ThunderClient.
+- La API está guiada por el contrato estricto de endpoints definido arriba. Prueba tu código usando Postman o ThunderClient.
 - **Enfoque Test-First**: Siempre comenzar generando/actualizando el archivo `thunder-collection.json` basado en el contrato de la API antes de escribir la lógica de negocio. Iterar sobre el código hasta que todos los endpoints pasen las pruebas.

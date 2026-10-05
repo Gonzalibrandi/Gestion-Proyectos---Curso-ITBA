@@ -1,0 +1,174 @@
+{
+  "info": {
+    "name": "Kanban API - ITBA",
+    "description": "API RESTful para gestión de proyectos Kanban",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Crear Tablero",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Proyecto Alpha\",\n  \"description\": \"Tablero principal del proyecto\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/boards",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "boards"
+          ]
+        }
+      }
+    },
+    {
+      "name": "2. Obtener Tablero",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/api/boards/{{boardId}}",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "boards",
+            "{{boardId}}"
+          ]
+        }
+      }
+    },
+    {
+      "name": "3. Crear Columna",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"To Do\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/boards/{{boardId}}/columns",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "boards",
+            "{{boardId}}",
+            "columns"
+          ]
+        }
+      }
+    },
+    {
+      "name": "4. Crear Ticket",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Implementar Auth\",\n  \"description\": \"Configurar JWT en el backend\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/boards/{{boardId}}/columns/{{columnId}}/tickets",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "boards",
+            "{{boardId}}",
+            "columns",
+            "{{columnId}}",
+            "tickets"
+          ]
+        }
+      }
+    },
+    {
+      "name": "5. Actualizar/Mover Ticket",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Implementar Auth (Actualizado)\",\n  \"newColumnId\": \"{{newColumnId}}\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/boards/{{boardId}}/columns/{{columnId}}/tickets/{{ticketId}}",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "boards",
+            "{{boardId}}",
+            "columns",
+            "{{columnId}}",
+            "tickets",
+            "{{ticketId}}"
+          ]
+        }
+      }
+    },
+    {
+      "name": "6. Eliminar Columna",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/api/boards/{{boardId}}/columns/{{columnId}}",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "boards",
+            "{{boardId}}",
+            "columns",
+            "{{columnId}}"
+          ]
+        }
+      }
+    }
+  ]
+}

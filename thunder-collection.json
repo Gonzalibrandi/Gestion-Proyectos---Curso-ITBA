@@ -1,0 +1,103 @@
+{
+  "client": "Thunder Client",
+  "collectionName": "Kanban API - ITBA",
+  "dateExported": "2026-10-05T20:00:00.000Z",
+  "version": "1.1",
+  "folders": [],
+  "requests": [
+    {
+      "_id": "req-1-create-board",
+      "colId": "col-kanban",
+      "containerId": "",
+      "name": "1. Crear Tablero",
+      "url": "http://localhost:3000/api/boards",
+      "method": "POST",
+      "sortNum": 10000,
+      "created": "2026-10-05T20:00:00.000Z",
+      "modified": "2026-10-05T20:00:00.000Z",
+      "headers": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"name\": \"Proyecto Alpha\",\n  \"description\": \"Tablero principal del proyecto\"\n}",
+        "form": []
+      }
+    },
+    {
+      "_id": "req-2-get-board",
+      "colId": "col-kanban",
+      "containerId": "",
+      "name": "2. Obtener Tablero",
+      "url": "http://localhost:3000/api/boards/{{boardId}}",
+      "method": "GET",
+      "sortNum": 20000,
+      "created": "2026-10-05T20:00:00.000Z",
+      "modified": "2026-10-05T20:00:00.000Z",
+      "headers": [],
+      "params": []
+    },
+    {
+      "_id": "req-3-create-col",
+      "colId": "col-kanban",
+      "containerId": "",
+      "name": "3. Crear Columna",
+      "url": "http://localhost:3000/api/boards/{{boardId}}/columns",
+      "method": "POST",
+      "sortNum": 30000,
+      "created": "2026-10-05T20:00:00.000Z",
+      "modified": "2026-10-05T20:00:00.000Z",
+      "headers": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"name\": \"To Do\"\n}",
+        "form": []
+      }
+    },
+    {
+      "_id": "req-4-create-ticket",
+      "colId": "col-kanban",
+      "containerId": "",
+      "name": "4. Crear Ticket",
+      "url": "http://localhost:3000/api/boards/{{boardId}}/columns/{{columnId}}/tickets",
+      "method": "POST",
+      "sortNum": 40000,
+      "created": "2026-10-05T20:00:00.000Z",
+      "modified": "2026-10-05T20:00:00.000Z",
+      "headers": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"title\": \"Implementar Auth\",\n  \"description\": \"Configurar JWT en el backend\"\n}",
+        "form": []
+      }
+    },
+    {
+      "_id": "req-5-patch-ticket",
+      "colId": "col-kanban",
+      "containerId": "",
+      "name": "5. Actualizar/Mover Ticket",
+      "url": "http://localhost:3000/api/boards/{{boardId}}/columns/{{columnId}}/tickets/{{ticketId}}",
+      "method": "PATCH",
+      "sortNum": 50000,
+      "created": "2026-10-05T20:00:00.000Z",
+      "modified": "2026-10-05T20:00:00.000Z",
+      "headers": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"title\": \"Implementar Auth (Actualizado)\",\n  \"newColumnId\": \"{{newColumnId}}\"\n}",
+        "form": []
+      }
+    },
+    {
+      "_id": "req-6-delete-col",
+      "colId": "col-kanban",
+      "containerId": "",
+      "name": "6. Eliminar Columna",
+      "url": "http://localhost:3000/api/boards/{{boardId}}/columns/{{columnId}}",
+      "method": "DELETE",
+      "sortNum": 60000,
+      "created": "2026-10-05T20:00:00.000Z",
+      "modified": "2026-10-05T20:00:00.000Z",
+      "headers": [],
+      "params": []
+    }
+  ]
+}

@@ -2,9 +2,6 @@
 
 API RESTful para la gestión de proyectos al estilo Kanban. Implementa un diseño estricto de rutas anidadas que refleja la relación jerárquica **Padre → Hijo → Nieto**: `Tableros (Boards) → Columnas (Columns) → Tickets`.
 
-- 🎥 **Video de pruebas:** _pendiente_
-- 🌐 **Deploy:** _pendiente_
-
 ## Tecnologías Utilizadas
 - **Node.js** v24
 - **Express** 4

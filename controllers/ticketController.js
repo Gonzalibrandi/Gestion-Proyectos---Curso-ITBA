@@ -1,35 +1,53 @@
 const Ticket = require('../models/Ticket');
 const Column = require('../models/Column');
+const { isValidObjectId, isNonEmptyString } = require('../utils/validation');
 
-const createTicket = async (req, res) => {
+const createTicket = async (req, res, next) => {
     try {
         const { title, description } = req.body;
         const { boardId, columnId } = req.params; // checkBoard y checkColumn garantizan su validez
 
-        if (!title) {
-            return res.status(400).json({ error: "El título del ticket es obligatorio" });
+        if (!isNonEmptyString(title)) {
+            return res.status(400).json({ error: "El título del ticket es obligatorio y debe ser un texto" });
         }
 
-        const ticket = new Ticket({ 
-            title, 
-            description, 
-            column: columnId, 
-            board: boardId 
+        if (description !== undefined && typeof description !== 'string') {
+            return res.status(400).json({ error: "La descripción del ticket debe ser un texto" });
+        }
+
+        const ticket = new Ticket({
+            title,
+            description,
+            column: columnId,
+            board: boardId
         });
-        
+
         await ticket.save();
-        
+
         return res.status(201).json(ticket);
     } catch (error) {
-        return res.status(500).json({ error: "Error al crear el ticket" });
+        next(error); // El manejador global traduce validaciones a 400 y el resto a 500
     }
 };
 
-const updateTicket = async (req, res) => {
+const updateTicket = async (req, res, next) => {
     try {
         const { title, description, newColumnId } = req.body;
         const { boardId } = req.params;
         const ticket = req.ticket; // ticket original validado por checkTicket
+
+        // Validación del payload: solo se validan los campos enviados (PATCH parcial)
+        if (title !== undefined && !isNonEmptyString(title)) {
+            return res.status(400).json({ error: "El título del ticket no puede estar vacío y debe ser un texto" });
+        }
+
+        if (description !== undefined && typeof description !== 'string') {
+            return res.status(400).json({ error: "La descripción del ticket debe ser un texto" });
+        }
+
+        if (newColumnId !== undefined && !isValidObjectId(newColumnId)) {
+            return res.status(400).json({ error: "El ID de la columna destino no tiene un formato válido" });
+        }
 
         let updated = false;
 
@@ -38,7 +56,7 @@ const updateTicket = async (req, res) => {
             ticket.title = title;
             updated = true;
         }
-        
+
         if (description !== undefined && description !== ticket.description) {
             ticket.description = description;
             updated = true;
@@ -68,7 +86,7 @@ const updateTicket = async (req, res) => {
 
         return res.status(200).json(ticket);
     } catch (error) {
-        return res.status(500).json({ error: "Error al actualizar/mover el ticket" });
+        next(error);
     }
 };
 

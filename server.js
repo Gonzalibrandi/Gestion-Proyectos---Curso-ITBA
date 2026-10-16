@@ -5,6 +5,7 @@ const cors = require('cors');
 
 // Importar el enrutador principal de Tableros
 const boardRoutes = require('./routes/boardRoutes');
+const { notFound, errorHandler } = require('./middlewares/errorHandler');
 
 const app = express();
 
@@ -17,18 +18,13 @@ app.use(express.json()); // Parsea payloads JSON en el req.body
 app.use('/api/boards', boardRoutes);
 
 // Manejo de Rutas Inexistentes (404 Global)
-app.use((req, res) => {
-    res.status(404).json({ error: "Ruta no encontrada" });
-});
+app.use(notFound);
 
-// Manejo Global de Errores imprevistos (500)
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({ error: "Error interno del servidor" });
-});
+// Manejo Global de Errores (JSON malformado y validaciones -> 400, imprevistos -> 500)
+app.use(errorHandler);
 
 // Conexión a Base de Datos y arranque del servidor
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3000;
 const MONGO_URI = process.env.MONGO_URI;
 
 mongoose.connect(MONGO_URI)

@@ -1,9 +1,7 @@
 const Board = require('../models/Board');
 const Column = require('../models/Column');
 const Ticket = require('../models/Ticket');
-
-// Utilidad para validar el formato de 24 caracteres hexadecimales de MongoDB
-const isValidObjectId = (id) => /^[0-9a-fA-F]{24}$/.test(id);
+const { isValidObjectId } = require('../utils/validation');
 
 /**
  * Middleware para validar que el Tablero existe.
@@ -61,10 +59,10 @@ const checkColumn = async (req, res, next) => {
 };
 
 /**
- * Middleware para validar que el Ticket existe y pertenece a la Columna.
+ * Middleware para validar que el Ticket existe y pertenece al Tablero y a la Columna.
  */
 const checkTicket = async (req, res, next) => {
-    const { columnId, ticketId } = req.params;
+    const { boardId, columnId, ticketId } = req.params;
     
     if (!ticketId) return next();
 
@@ -78,8 +76,18 @@ const checkTicket = async (req, res, next) => {
             return res.status(404).json({ error: "El Ticket solicitado no existe" });
         }
 
+        // Aislamiento de rutas: Verificamos que el ticket realmente pertenezca al tablero de la URL
+        if (boardId && ticket.board.toString() !== boardId) {
+            return res.status(400).json({ error: "Aislamiento de Rutas: El ticket solicitado existe pero NO pertenece al tablero especificado en la URL" });
+        }
+
+        // Idempotencia: si se reintenta un PATCH que ya movió el ticket (ej. por una falla de red),
+        // el ticket ya está en la columna destino. No es un error: el controlador responde 200 sin volver a modificarlo.
+        const currentColumnId = ticket.column.toString();
+        const isRetriedMove = req.method === 'PATCH' && req.body.newColumnId === currentColumnId;
+
         // Aislamiento de rutas: Verificamos que el ticket realmente pertenezca a la columna de la URL
-        if (columnId && ticket.column.toString() !== columnId) {
+        if (columnId && currentColumnId !== columnId && !isRetriedMove) {
             return res.status(400).json({ error: "Aislamiento de Rutas: El ticket solicitado existe pero NO pertenece a la columna especificada en la URL" });
         }
 

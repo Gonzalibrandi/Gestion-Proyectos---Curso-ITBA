@@ -10,6 +10,9 @@ router.post('/', boardController.createBoard);
 // GET /api/boards/:boardId
 router.get('/:boardId', checkBoard, boardController.getBoard);
 
+// DELETE /api/boards/:boardId (borrado en cascada de Columnas y Tickets)
+router.delete('/:boardId', checkBoard, boardController.deleteBoard);
+
 // Anidamos las rutas de columnas dentro de los tableros
 // Esto ataja todas las peticiones a /api/boards/:boardId/columns
 router.use('/:boardId/columns', columnRoutes);

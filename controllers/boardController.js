@@ -40,7 +40,20 @@ const getBoard = async (req, res, next) => {
     }
 };
 
+const deleteBoard = async (req, res, next) => {
+    try {
+        // req.board viene inyectado por el middleware checkBoard
+        // Usamos deleteOne() en el documento para disparar los hooks de Mongoose (borrado en cascada de Columnas y Tickets)
+        await req.board.deleteOne();
+
+        return res.status(204).send(); // 204 No Content
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     createBoard,
-    getBoard
+    getBoard,
+    deleteBoard
 };

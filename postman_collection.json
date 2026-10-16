@@ -1,174 +1,784 @@
 {
   "info": {
     "name": "Kanban API - ITBA",
-    "description": "API RESTful para gestión de proyectos Kanban",
+    "description": "API RESTful para gestión de proyectos Kanban. Ejecutar la colección completa en orden (Run collection): los IDs se guardan automáticamente en variables de colección.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "boardId",
+      "value": ""
+    },
+    {
+      "key": "columnId",
+      "value": ""
+    },
+    {
+      "key": "newColumnId",
+      "value": ""
+    },
+    {
+      "key": "ticketId",
+      "value": ""
+    },
+    {
+      "key": "otherBoardId",
+      "value": ""
+    },
+    {
+      "key": "otherColumnId",
+      "value": ""
+    }
+  ],
   "item": [
     {
-      "name": "1. Crear Tablero",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
+      "name": "1. Flujo principal",
+      "item": [
+        {
+          "name": "01. Crear Tablero",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", function () { pm.response.to.have.status(201); });",
+                  "const json = pm.response.json();",
+                  "pm.collectionVariables.set(\"boardId\", json._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Proyecto Alpha\",\n  \"description\": \"Tablero principal del proyecto\"\n}"
+            },
+            "url": "{{baseUrl}}/api/boards"
           }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"name\": \"Proyecto Alpha\",\n  \"description\": \"Tablero principal del proyecto\"\n}"
         },
-        "url": {
-          "raw": "http://localhost:3000/api/boards",
-          "protocol": "http",
-          "host": [
-            "localhost"
+        {
+          "name": "02. Crear Columna \"To Do\"",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", function () { pm.response.to.have.status(201); });",
+                  "const json = pm.response.json();",
+                  "pm.collectionVariables.set(\"columnId\", json._id);"
+                ]
+              }
+            }
           ],
-          "port": "3000",
-          "path": [
-            "api",
-            "boards"
-          ]
-        }
-      }
-    },
-    {
-      "name": "2. Obtener Tablero",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "http://localhost:3000/api/boards/{{boardId}}",
-          "protocol": "http",
-          "host": [
-            "localhost"
-          ],
-          "port": "3000",
-          "path": [
-            "api",
-            "boards",
-            "{{boardId}}"
-          ]
-        }
-      }
-    },
-    {
-      "name": "3. Crear Columna",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"To Do\"\n}"
+            },
+            "url": "{{baseUrl}}/api/boards/{{boardId}}/columns"
           }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"name\": \"To Do\"\n}"
         },
-        "url": {
-          "raw": "http://localhost:3000/api/boards/{{boardId}}/columns",
-          "protocol": "http",
-          "host": [
-            "localhost"
+        {
+          "name": "03. Crear Columna \"Doing\"",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", function () { pm.response.to.have.status(201); });",
+                  "const json = pm.response.json();",
+                  "pm.collectionVariables.set(\"newColumnId\", json._id);"
+                ]
+              }
+            }
           ],
-          "port": "3000",
-          "path": [
-            "api",
-            "boards",
-            "{{boardId}}",
-            "columns"
-          ]
-        }
-      }
-    },
-    {
-      "name": "4. Crear Ticket",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Doing\"\n}"
+            },
+            "url": "{{baseUrl}}/api/boards/{{boardId}}/columns"
           }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"title\": \"Implementar Auth\",\n  \"description\": \"Configurar JWT en el backend\"\n}"
         },
-        "url": {
-          "raw": "http://localhost:3000/api/boards/{{boardId}}/columns/{{columnId}}/tickets",
-          "protocol": "http",
-          "host": [
-            "localhost"
+        {
+          "name": "04. Crear Ticket",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", function () { pm.response.to.have.status(201); });",
+                  "const json = pm.response.json();",
+                  "pm.collectionVariables.set(\"ticketId\", json._id);"
+                ]
+              }
+            }
           ],
-          "port": "3000",
-          "path": [
-            "api",
-            "boards",
-            "{{boardId}}",
-            "columns",
-            "{{columnId}}",
-            "tickets"
-          ]
-        }
-      }
-    },
-    {
-      "name": "5. Actualizar/Mover Ticket",
-      "request": {
-        "method": "PATCH",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Implementar Auth\",\n  \"description\": \"Configurar JWT en el backend\"\n}"
+            },
+            "url": "{{baseUrl}}/api/boards/{{boardId}}/columns/{{columnId}}/tickets"
           }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"title\": \"Implementar Auth (Actualizado)\",\n  \"newColumnId\": \"{{newColumnId}}\"\n}"
         },
-        "url": {
-          "raw": "http://localhost:3000/api/boards/{{boardId}}/columns/{{columnId}}/tickets/{{ticketId}}",
-          "protocol": "http",
-          "host": [
-            "localhost"
+        {
+          "name": "05. Obtener Tablero (columnas pobladas)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Tiene 2 columnas pobladas\", function () { pm.expect(json.columns).to.have.lengthOf(2); });"
+                ]
+              }
+            }
           ],
-          "port": "3000",
-          "path": [
-            "api",
-            "boards",
-            "{{boardId}}",
-            "columns",
-            "{{columnId}}",
-            "tickets",
-            "{{ticketId}}"
-          ]
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/boards/{{boardId}}"
+          }
+        },
+        {
+          "name": "06. Actualizar contenido del Ticket",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Implementar Auth (Actualizado)\",\n  \"description\": \"JWT + refresh tokens\"\n}"
+            },
+            "url": "{{baseUrl}}/api/boards/{{boardId}}/columns/{{columnId}}/tickets/{{ticketId}}"
+          }
+        },
+        {
+          "name": "07. Mover Ticket a \"Doing\"",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "const json = pm.response.json();",
+                  "pm.test(\"El ticket quedó en la columna newColumnId\", function () { pm.expect(json.column).to.eql(pm.collectionVariables.get(\"newColumnId\")); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"newColumnId\": \"{{newColumnId}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/boards/{{boardId}}/columns/{{columnId}}/tickets/{{ticketId}}"
+          }
+        },
+        {
+          "name": "08. Reintentar Mover Ticket (idempotencia)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "const json = pm.response.json();",
+                  "pm.test(\"El ticket quedó en la columna newColumnId\", function () { pm.expect(json.column).to.eql(pm.collectionVariables.get(\"newColumnId\")); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"newColumnId\": \"{{newColumnId}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/boards/{{boardId}}/columns/{{columnId}}/tickets/{{ticketId}}"
+          }
         }
-      }
+      ]
     },
     {
-      "name": "6. Eliminar Columna",
-      "request": {
-        "method": "DELETE",
-        "header": [],
-        "url": {
-          "raw": "http://localhost:3000/api/boards/{{boardId}}/columns/{{columnId}}",
-          "protocol": "http",
-          "host": [
-            "localhost"
+      "name": "2. Validaciones y errores",
+      "item": [
+        {
+          "name": "09. Crear Tablero B (auxiliar)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", function () { pm.response.to.have.status(201); });",
+                  "const json = pm.response.json();",
+                  "pm.collectionVariables.set(\"otherBoardId\", json._id);"
+                ]
+              }
+            }
           ],
-          "port": "3000",
-          "path": [
-            "api",
-            "boards",
-            "{{boardId}}",
-            "columns",
-            "{{columnId}}"
-          ]
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Proyecto Beta\"\n}"
+            },
+            "url": "{{baseUrl}}/api/boards"
+          }
+        },
+        {
+          "name": "10. Crear Columna en Tablero B (auxiliar)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", function () { pm.response.to.have.status(201); });",
+                  "const json = pm.response.json();",
+                  "pm.collectionVariables.set(\"otherColumnId\", json._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Backlog\"\n}"
+            },
+            "url": "{{baseUrl}}/api/boards/{{otherBoardId}}/columns"
+          }
+        },
+        {
+          "name": "11. 400 - Tablero sin nombre",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", function () { pm.response.to.have.status(400); });",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Formato de error { error: string }\", function () { pm.expect(json.error).to.be.a(\"string\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Sin nombre\"\n}"
+            },
+            "url": "{{baseUrl}}/api/boards"
+          }
+        },
+        {
+          "name": "12. 400 - JSON malformado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", function () { pm.response.to.have.status(400); });",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Formato de error { error: string }\", function () { pm.expect(json.error).to.be.a(\"string\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"name\": "
+            },
+            "url": "{{baseUrl}}/api/boards"
+          }
+        },
+        {
+          "name": "13. 400 - ID de Tablero con formato inválido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", function () { pm.response.to.have.status(400); });",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Formato de error { error: string }\", function () { pm.expect(json.error).to.be.a(\"string\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/boards/123"
+          }
+        },
+        {
+          "name": "14. 404 - Tablero inexistente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 404\", function () { pm.response.to.have.status(404); });",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Formato de error { error: string }\", function () { pm.expect(json.error).to.be.a(\"string\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/boards/000000000000000000000000"
+          }
+        },
+        {
+          "name": "15. 404 - Columna en Tablero inexistente (Parent Check)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 404\", function () { pm.response.to.have.status(404); });",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Formato de error { error: string }\", function () { pm.expect(json.error).to.be.a(\"string\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Huérfana\"\n}"
+            },
+            "url": "{{baseUrl}}/api/boards/000000000000000000000000/columns"
+          }
+        },
+        {
+          "name": "16. 400 - Ticket sin título",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", function () { pm.response.to.have.status(400); });",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Formato de error { error: string }\", function () { pm.expect(json.error).to.be.a(\"string\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Sin título\"\n}"
+            },
+            "url": "{{baseUrl}}/api/boards/{{boardId}}/columns/{{columnId}}/tickets"
+          }
+        },
+        {
+          "name": "17. 404 - Ticket en Columna inexistente (Parent Check)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 404\", function () { pm.response.to.have.status(404); });",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Formato de error { error: string }\", function () { pm.expect(json.error).to.be.a(\"string\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Huérfano\"\n}"
+            },
+            "url": "{{baseUrl}}/api/boards/{{boardId}}/columns/000000000000000000000000/tickets"
+          }
+        },
+        {
+          "name": "18. 400 - Ticket en Columna de otro Tablero (Aislamiento)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", function () { pm.response.to.have.status(400); });",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Formato de error { error: string }\", function () { pm.expect(json.error).to.be.a(\"string\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Intruso\"\n}"
+            },
+            "url": "{{baseUrl}}/api/boards/{{boardId}}/columns/{{otherColumnId}}/tickets"
+          }
+        },
+        {
+          "name": "19. 400 - Ticket desde una Columna a la que no pertenece (Aislamiento)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", function () { pm.response.to.have.status(400); });",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Formato de error { error: string }\", function () { pm.expect(json.error).to.be.a(\"string\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Otro título\"\n}"
+            },
+            "url": "{{baseUrl}}/api/boards/{{boardId}}/columns/{{columnId}}/tickets/{{ticketId}}"
+          }
+        },
+        {
+          "name": "20. 400 - Mover Ticket con newColumnId inválido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", function () { pm.response.to.have.status(400); });",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Formato de error { error: string }\", function () { pm.expect(json.error).to.be.a(\"string\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"newColumnId\": \"abc\"\n}"
+            },
+            "url": "{{baseUrl}}/api/boards/{{boardId}}/columns/{{newColumnId}}/tickets/{{ticketId}}"
+          }
+        },
+        {
+          "name": "21. 400 - Mover Ticket a Columna de otro Tablero",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", function () { pm.response.to.have.status(400); });",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Formato de error { error: string }\", function () { pm.expect(json.error).to.be.a(\"string\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"newColumnId\": \"{{otherColumnId}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/boards/{{boardId}}/columns/{{newColumnId}}/tickets/{{ticketId}}"
+          }
         }
-      }
+      ]
+    },
+    {
+      "name": "3. Borrado en cascada",
+      "item": [
+        {
+          "name": "22. Eliminar Columna \"Doing\" (contiene el Ticket)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 204\", function () { pm.response.to.have.status(204); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/boards/{{boardId}}/columns/{{newColumnId}}"
+          }
+        },
+        {
+          "name": "23. Verificar cascada: el Ticket fue eliminado (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 404\", function () { pm.response.to.have.status(404); });",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Formato de error { error: string }\", function () { pm.expect(json.error).to.be.a(\"string\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Fantasma\"\n}"
+            },
+            "url": "{{baseUrl}}/api/boards/{{boardId}}/columns/{{columnId}}/tickets/{{ticketId}}"
+          }
+        },
+        {
+          "name": "24. Eliminar Tablero B",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 204\", function () { pm.response.to.have.status(204); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/boards/{{otherBoardId}}"
+          }
+        },
+        {
+          "name": "25. Verificar cascada: la Columna del Tablero B fue eliminada (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 404\", function () { pm.response.to.have.status(404); });",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Formato de error { error: string }\", function () { pm.expect(json.error).to.be.a(\"string\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/boards/{{boardId}}/columns/{{otherColumnId}}"
+          }
+        },
+        {
+          "name": "26. Eliminar Tablero principal",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 204\", function () { pm.response.to.have.status(204); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/boards/{{boardId}}"
+          }
+        },
+        {
+          "name": "27. Verificar: el Tablero principal ya no existe (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 404\", function () { pm.response.to.have.status(404); });",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Formato de error { error: string }\", function () { pm.expect(json.error).to.be.a(\"string\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/boards/{{boardId}}"
+          }
+        }
+      ]
     }
   ]
 }

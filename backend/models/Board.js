@@ -5,11 +5,16 @@ const boardSchema = new mongoose.Schema({
         type: String, 
         required: [true, 'El nombre del tablero es obligatorio'] 
     },
-    description: { 
+    description: {
         type: String,
         default: ''
+    },
+    owner: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: [true, 'El tablero debe tener un dueño']
     }
-}, { 
+}, {
     timestamps: true 
 });
 

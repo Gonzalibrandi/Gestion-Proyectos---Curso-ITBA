@@ -3,9 +3,13 @@ const router = express.Router();
 const boardController = require('../controllers/boardController');
 const columnRoutes = require('./columnRoutes');
 const { checkBoard } = require('../middlewares/parentCheck');
+const { requireUser } = require('../middlewares/currentUser');
 
-// POST /api/boards
-router.post('/', boardController.createBoard);
+// GET /api/boards (tableros del usuario actual)
+router.get('/', requireUser, boardController.getBoards);
+
+// POST /api/boards (el dueño es el usuario actual)
+router.post('/', requireUser, boardController.createBoard);
 
 // GET /api/boards/:boardId
 router.get('/:boardId', checkBoard, boardController.getBoard);

@@ -10,4 +10,7 @@ router.post('/', checkBoard, checkColumn, ticketController.createTicket);
 // PATCH /api/boards/:boardId/columns/:columnId/tickets/:ticketId
 router.patch('/:ticketId', checkBoard, checkColumn, checkTicket, ticketController.updateTicket);
 
+// DELETE /api/boards/:boardId/columns/:columnId/tickets/:ticketId
+router.delete('/:ticketId', checkBoard, checkColumn, checkTicket, ticketController.deleteTicket);
+
 module.exports = router;

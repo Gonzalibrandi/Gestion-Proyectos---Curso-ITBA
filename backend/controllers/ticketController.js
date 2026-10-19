@@ -1,10 +1,12 @@
 const Ticket = require('../models/Ticket');
 const Column = require('../models/Column');
-const { isValidObjectId, isNonEmptyString } = require('../utils/validation');
+const { isValidObjectId, isNonEmptyString, isValidPriority, TICKET_PRIORITIES } = require('../utils/validation');
+
+const INVALID_PRIORITY_MESSAGE = `La prioridad del ticket debe ser una de: ${TICKET_PRIORITIES.join(', ')}`;
 
 const createTicket = async (req, res, next) => {
     try {
-        const { title, description } = req.body;
+        const { title, description, priority } = req.body;
         const { boardId, columnId } = req.params; // checkBoard y checkColumn garantizan su validez
 
         if (!isNonEmptyString(title)) {
@@ -15,9 +17,14 @@ const createTicket = async (req, res, next) => {
             return res.status(400).json({ error: "La descripción del ticket debe ser un texto" });
         }
 
+        if (priority !== undefined && !isValidPriority(priority)) {
+            return res.status(400).json({ error: INVALID_PRIORITY_MESSAGE });
+        }
+
         const ticket = new Ticket({
             title,
             description,
+            priority, // Si no se envía, el esquema aplica 'medium' por defecto
             column: columnId,
             board: boardId
         });
@@ -32,7 +39,7 @@ const createTicket = async (req, res, next) => {
 
 const updateTicket = async (req, res, next) => {
     try {
-        const { title, description, newColumnId } = req.body;
+        const { title, description, priority, newColumnId } = req.body;
         const { boardId } = req.params;
         const ticket = req.ticket; // ticket original validado por checkTicket
 
@@ -43,6 +50,10 @@ const updateTicket = async (req, res, next) => {
 
         if (description !== undefined && typeof description !== 'string') {
             return res.status(400).json({ error: "La descripción del ticket debe ser un texto" });
+        }
+
+        if (priority !== undefined && !isValidPriority(priority)) {
+            return res.status(400).json({ error: INVALID_PRIORITY_MESSAGE });
         }
 
         if (newColumnId !== undefined && !isValidObjectId(newColumnId)) {
@@ -59,6 +70,11 @@ const updateTicket = async (req, res, next) => {
 
         if (description !== undefined && description !== ticket.description) {
             ticket.description = description;
+            updated = true;
+        }
+
+        if (priority !== undefined && priority !== ticket.priority) {
+            ticket.priority = priority;
             updated = true;
         }
 
@@ -90,7 +106,19 @@ const updateTicket = async (req, res, next) => {
     }
 };
 
+const deleteTicket = async (req, res, next) => {
+    try {
+        // req.ticket viene inyectado por el middleware checkTicket (ya validó que pertenece al tablero y a la columna)
+        await req.ticket.deleteOne();
+
+        return res.status(204).send(); // 204 No Content
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     createTicket,
-    updateTicket
+    updateTicket,
+    deleteTicket
 };

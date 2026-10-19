@@ -1,6 +1,17 @@
 const Board = require('../models/Board');
 const { isNonEmptyString } = require('../utils/validation');
 
+const getBoards = async (req, res, next) => {
+    try {
+        // req.user viene del middleware requireUser: solo se listan los tableros del usuario actual
+        const boards = await Board.find({ owner: req.user._id }).sort({ createdAt: -1 });
+
+        return res.status(200).json(boards);
+    } catch (error) {
+        next(error);
+    }
+};
+
 const createBoard = async (req, res, next) => {
     try {
         const { name, description } = req.body;
@@ -13,7 +24,8 @@ const createBoard = async (req, res, next) => {
             return res.status(400).json({ error: "La descripción del tablero debe ser un texto" });
         }
 
-        const board = new Board({ name, description });
+        // El dueño del tablero es el usuario actual (inyectado por requireUser)
+        const board = new Board({ name, description, owner: req.user._id });
         await board.save();
 
         return res.status(201).json(board);
@@ -53,6 +65,7 @@ const deleteBoard = async (req, res, next) => {
 };
 
 module.exports = {
+    getBoards,
     createBoard,
     getBoard,
     deleteBoard

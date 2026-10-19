@@ -1,13 +1,22 @@
 const mongoose = require('mongoose');
+const { TICKET_PRIORITIES } = require('../utils/validation');
 
 const ticketSchema = new mongoose.Schema({
-    title: { 
-        type: String, 
-        required: [true, 'El título del ticket es obligatorio'] 
+    title: {
+        type: String,
+        required: [true, 'El título del ticket es obligatorio']
     },
-    description: { 
+    description: {
         type: String,
         default: ''
+    },
+    priority: {
+        type: String,
+        enum: {
+            values: TICKET_PRIORITIES,
+            message: `La prioridad del ticket debe ser una de: ${TICKET_PRIORITIES.join(', ')}`
+        },
+        default: 'medium'
     },
     column: { 
         type: mongoose.Schema.Types.ObjectId, 

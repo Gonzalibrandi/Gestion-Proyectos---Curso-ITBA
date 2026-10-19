@@ -32,5 +32,10 @@
     "msw": "^2.15.0",
     "oxlint": "^1.88.0",
     "vite": "^8.3.4"
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
   }
 }

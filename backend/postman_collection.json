@@ -1,13 +1,17 @@
 {
   "info": {
     "name": "Kanban API - ITBA",
-    "description": "API RESTful para gestión de proyectos Kanban. Ejecutar la colección completa en orden (Run collection): los IDs se guardan automáticamente en variables de colección.",
+    "description": "API RESTful para gestión de proyectos Kanban. Ejecutar la colección completa en orden (Run collection): el login guarda userId y los IDs creados se guardan automáticamente en variables de colección. Las credenciales deben coincidir con DEMO_USER_EMAIL y DEMO_USER_PASSWORD del backend.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
     {
       "key": "baseUrl",
       "value": "http://localhost:3000"
+    },
+    {
+      "key": "userId",
+      "value": ""
     },
     {
       "key": "boardId",
@@ -26,6 +30,10 @@
       "value": ""
     },
     {
+      "key": "secondTicketId",
+      "value": ""
+    },
+    {
       "key": "otherBoardId",
       "value": ""
     },
@@ -36,19 +44,40 @@
   ],
   "item": [
     {
-      "name": "1. Flujo principal",
+      "name": "0. Health y Login",
       "item": [
         {
-          "name": "01. Crear Tablero",
+          "name": "01. Health check",
           "event": [
             {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Status 201\", function () { pm.response.to.have.status(201); });",
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
                   "const json = pm.response.json();",
-                  "pm.collectionVariables.set(\"boardId\", json._id);"
+                  "pm.test(\"json.status = ok\", function () { pm.expect(json.status).to.eql(\"ok\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/health"
+          }
+        },
+        {
+          "name": "02. 400 - Login sin contraseña",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", function () { pm.response.to.have.status(400); });",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Formato de error { error: string }\", function () { pm.expect(json.error).to.be.a(\"string\"); });"
                 ]
               }
             }
@@ -63,13 +92,141 @@
             ],
             "body": {
               "mode": "raw",
+              "raw": "{\n  \"email\": \"demo@kanban.com\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/login"
+          }
+        },
+        {
+          "name": "03. 401 - Login con credenciales incorrectas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 401\", function () { pm.response.to.have.status(401); });",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Formato de error { error: string }\", function () { pm.expect(json.error).to.be.a(\"string\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"demo@kanban.com\",\n  \"password\": \"incorrecta\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/login"
+          }
+        },
+        {
+          "name": "04. Login del usuario único",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "const json = pm.response.json();",
+                  "pm.collectionVariables.set(\"userId\", json._id);",
+                  "pm.test(\"json.email = demo@kanban.com\", function () { pm.expect(json.email).to.eql(\"demo@kanban.com\"); });",
+                  "pm.test(\"No expone la contraseña\", function () { pm.expect(json).to.not.have.property(\"password\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"demo@kanban.com\",\n  \"password\": \"demo1234\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/login"
+          }
+        }
+      ]
+    },
+    {
+      "name": "1. Flujo principal",
+      "item": [
+        {
+          "name": "05. Crear Tablero",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", function () { pm.response.to.have.status(201); });",
+                  "const json = pm.response.json();",
+                  "pm.collectionVariables.set(\"boardId\", json._id);",
+                  "pm.test(\"json.owner = {{userId}}\", function () { pm.expect(json.owner).to.eql(pm.collectionVariables.get(\"userId\")); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-User-Id",
+                "value": "{{userId}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
               "raw": "{\n  \"name\": \"Proyecto Alpha\",\n  \"description\": \"Tablero principal del proyecto\"\n}"
             },
             "url": "{{baseUrl}}/api/boards"
           }
         },
         {
-          "name": "02. Crear Columna \"To Do\"",
+          "name": "06. Listar Tableros del usuario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "const json = pm.response.json();",
+                  "pm.test(\"json[0]._id = {{boardId}}\", function () { pm.expect(json[0]._id).to.eql(pm.collectionVariables.get(\"boardId\")); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-User-Id",
+                "value": "{{userId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/boards"
+          }
+        },
+        {
+          "name": "07. Crear Columna \"To Do\"",
           "event": [
             {
               "listen": "test",
@@ -99,7 +256,7 @@
           }
         },
         {
-          "name": "03. Crear Columna \"Doing\"",
+          "name": "08. Crear Columna \"Doing\"",
           "event": [
             {
               "listen": "test",
@@ -129,7 +286,7 @@
           }
         },
         {
-          "name": "04. Crear Ticket",
+          "name": "09. Crear Ticket con prioridad alta",
           "event": [
             {
               "listen": "test",
@@ -138,7 +295,8 @@
                 "exec": [
                   "pm.test(\"Status 201\", function () { pm.response.to.have.status(201); });",
                   "const json = pm.response.json();",
-                  "pm.collectionVariables.set(\"ticketId\", json._id);"
+                  "pm.collectionVariables.set(\"ticketId\", json._id);",
+                  "pm.test(\"json.priority = high\", function () { pm.expect(json.priority).to.eql(\"high\"); });"
                 ]
               }
             }
@@ -153,13 +311,44 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"Implementar Auth\",\n  \"description\": \"Configurar JWT en el backend\"\n}"
+              "raw": "{\n  \"title\": \"Implementar Auth\",\n  \"description\": \"Configurar JWT en el backend\",\n  \"priority\": \"high\"\n}"
             },
             "url": "{{baseUrl}}/api/boards/{{boardId}}/columns/{{columnId}}/tickets"
           }
         },
         {
-          "name": "05. Obtener Tablero (columnas pobladas)",
+          "name": "10. Crear Ticket sin prioridad (por defecto media)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", function () { pm.response.to.have.status(201); });",
+                  "const json = pm.response.json();",
+                  "pm.collectionVariables.set(\"secondTicketId\", json._id);",
+                  "pm.test(\"json.priority = medium\", function () { pm.expect(json.priority).to.eql(\"medium\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Escribir README\"\n}"
+            },
+            "url": "{{baseUrl}}/api/boards/{{boardId}}/columns/{{columnId}}/tickets"
+          }
+        },
+        {
+          "name": "11. Obtener Tablero (columnas pobladas)",
           "event": [
             {
               "listen": "test",
@@ -168,7 +357,7 @@
                 "exec": [
                   "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
                   "const json = pm.response.json();",
-                  "pm.test(\"Tiene 2 columnas pobladas\", function () { pm.expect(json.columns).to.have.lengthOf(2); });"
+                  "pm.test(\"json.columns tiene 2 elementos\", function () { pm.expect(json.columns).to.have.lengthOf(2); });"
                 ]
               }
             }
@@ -180,14 +369,16 @@
           }
         },
         {
-          "name": "06. Actualizar contenido del Ticket",
+          "name": "12. Actualizar contenido y prioridad del Ticket",
           "event": [
             {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });"
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "const json = pm.response.json();",
+                  "pm.test(\"json.priority = low\", function () { pm.expect(json.priority).to.eql(\"low\"); });"
                 ]
               }
             }
@@ -202,13 +393,13 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"Implementar Auth (Actualizado)\",\n  \"description\": \"JWT + refresh tokens\"\n}"
+              "raw": "{\n  \"title\": \"Implementar Auth (Actualizado)\",\n  \"description\": \"JWT + refresh tokens\",\n  \"priority\": \"low\"\n}"
             },
             "url": "{{baseUrl}}/api/boards/{{boardId}}/columns/{{columnId}}/tickets/{{ticketId}}"
           }
         },
         {
-          "name": "07. Mover Ticket a \"Doing\"",
+          "name": "13. Mover Ticket a \"Doing\"",
           "event": [
             {
               "listen": "test",
@@ -217,7 +408,7 @@
                 "exec": [
                   "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
                   "const json = pm.response.json();",
-                  "pm.test(\"El ticket quedó en la columna newColumnId\", function () { pm.expect(json.column).to.eql(pm.collectionVariables.get(\"newColumnId\")); });"
+                  "pm.test(\"json.column = {{newColumnId}}\", function () { pm.expect(json.column).to.eql(pm.collectionVariables.get(\"newColumnId\")); });"
                 ]
               }
             }
@@ -238,7 +429,7 @@
           }
         },
         {
-          "name": "08. Reintentar Mover Ticket (idempotencia)",
+          "name": "14. Reintentar Mover Ticket (idempotencia)",
           "event": [
             {
               "listen": "test",
@@ -247,7 +438,7 @@
                 "exec": [
                   "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
                   "const json = pm.response.json();",
-                  "pm.test(\"El ticket quedó en la columna newColumnId\", function () { pm.expect(json.column).to.eql(pm.collectionVariables.get(\"newColumnId\")); });"
+                  "pm.test(\"json.column = {{newColumnId}}\", function () { pm.expect(json.column).to.eql(pm.collectionVariables.get(\"newColumnId\")); });"
                 ]
               }
             }
@@ -265,6 +456,46 @@
               "raw": "{\n  \"newColumnId\": \"{{newColumnId}}\"\n}"
             },
             "url": "{{baseUrl}}/api/boards/{{boardId}}/columns/{{columnId}}/tickets/{{ticketId}}"
+          }
+        },
+        {
+          "name": "15. Eliminar Ticket",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 204\", function () { pm.response.to.have.status(204); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/boards/{{boardId}}/columns/{{columnId}}/tickets/{{secondTicketId}}"
+          }
+        },
+        {
+          "name": "16. Verificar: el Ticket eliminado ya no existe (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 404\", function () { pm.response.to.have.status(404); });",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Formato de error { error: string }\", function () { pm.expect(json.error).to.be.a(\"string\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/boards/{{boardId}}/columns/{{columnId}}/tickets/{{secondTicketId}}"
           }
         }
       ]
@@ -273,7 +504,7 @@
       "name": "2. Validaciones y errores",
       "item": [
         {
-          "name": "09. Crear Tablero B (auxiliar)",
+          "name": "17. Crear Tablero B (auxiliar)",
           "event": [
             {
               "listen": "test",
@@ -293,6 +524,10 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "X-User-Id",
+                "value": "{{userId}}"
               }
             ],
             "body": {
@@ -303,7 +538,7 @@
           }
         },
         {
-          "name": "10. Crear Columna en Tablero B (auxiliar)",
+          "name": "18. Crear Columna en Tablero B (auxiliar)",
           "event": [
             {
               "listen": "test",
@@ -333,7 +568,88 @@
           }
         },
         {
-          "name": "11. 400 - Tablero sin nombre",
+          "name": "19. 401 - Listar Tableros sin X-User-Id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 401\", function () { pm.response.to.have.status(401); });",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Formato de error { error: string }\", function () { pm.expect(json.error).to.be.a(\"string\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/boards"
+          }
+        },
+        {
+          "name": "20. 400 - X-User-Id con formato inválido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", function () { pm.response.to.have.status(400); });",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Formato de error { error: string }\", function () { pm.expect(json.error).to.be.a(\"string\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-User-Id",
+                "value": "abc"
+              }
+            ],
+            "url": "{{baseUrl}}/api/boards"
+          }
+        },
+        {
+          "name": "21. 401 - Crear Tablero con un usuario inexistente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 401\", function () { pm.response.to.have.status(401); });",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Formato de error { error: string }\", function () { pm.expect(json.error).to.be.a(\"string\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-User-Id",
+                "value": "000000000000000000000000"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Fantasma\"\n}"
+            },
+            "url": "{{baseUrl}}/api/boards"
+          }
+        },
+        {
+          "name": "22. 400 - Tablero sin nombre",
           "event": [
             {
               "listen": "test",
@@ -353,6 +669,10 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "X-User-Id",
+                "value": "{{userId}}"
               }
             ],
             "body": {
@@ -363,7 +683,7 @@
           }
         },
         {
-          "name": "12. 400 - JSON malformado",
+          "name": "23. 400 - JSON malformado",
           "event": [
             {
               "listen": "test",
@@ -383,6 +703,10 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "X-User-Id",
+                "value": "{{userId}}"
               }
             ],
             "body": {
@@ -393,7 +717,7 @@
           }
         },
         {
-          "name": "13. 400 - ID de Tablero con formato inválido",
+          "name": "24. 400 - ID de Tablero con formato inválido",
           "event": [
             {
               "listen": "test",
@@ -414,7 +738,7 @@
           }
         },
         {
-          "name": "14. 404 - Tablero inexistente",
+          "name": "25. 404 - Tablero inexistente",
           "event": [
             {
               "listen": "test",
@@ -435,7 +759,7 @@
           }
         },
         {
-          "name": "15. 404 - Columna en Tablero inexistente (Parent Check)",
+          "name": "26. 404 - Columna en Tablero inexistente (Parent Check)",
           "event": [
             {
               "listen": "test",
@@ -465,7 +789,7 @@
           }
         },
         {
-          "name": "16. 400 - Ticket sin título",
+          "name": "27. 400 - Ticket sin título",
           "event": [
             {
               "listen": "test",
@@ -495,7 +819,37 @@
           }
         },
         {
-          "name": "17. 404 - Ticket en Columna inexistente (Parent Check)",
+          "name": "28. 400 - Ticket con prioridad inválida",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", function () { pm.response.to.have.status(400); });",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Formato de error { error: string }\", function () { pm.expect(json.error).to.be.a(\"string\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Urgente\",\n  \"priority\": \"urgent\"\n}"
+            },
+            "url": "{{baseUrl}}/api/boards/{{boardId}}/columns/{{columnId}}/tickets"
+          }
+        },
+        {
+          "name": "29. 404 - Ticket en Columna inexistente (Parent Check)",
           "event": [
             {
               "listen": "test",
@@ -525,7 +879,7 @@
           }
         },
         {
-          "name": "18. 400 - Ticket en Columna de otro Tablero (Aislamiento)",
+          "name": "30. 400 - Ticket en Columna de otro Tablero (Aislamiento)",
           "event": [
             {
               "listen": "test",
@@ -555,7 +909,7 @@
           }
         },
         {
-          "name": "19. 400 - Ticket desde una Columna a la que no pertenece (Aislamiento)",
+          "name": "31. 400 - Ticket desde una Columna a la que no pertenece (Aislamiento)",
           "event": [
             {
               "listen": "test",
@@ -585,7 +939,37 @@
           }
         },
         {
-          "name": "20. 400 - Mover Ticket con newColumnId inválido",
+          "name": "32. 400 - Actualizar Ticket con prioridad inválida",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", function () { pm.response.to.have.status(400); });",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Formato de error { error: string }\", function () { pm.expect(json.error).to.be.a(\"string\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"priority\": \"urgent\"\n}"
+            },
+            "url": "{{baseUrl}}/api/boards/{{boardId}}/columns/{{newColumnId}}/tickets/{{ticketId}}"
+          }
+        },
+        {
+          "name": "33. 400 - Mover Ticket con newColumnId inválido",
           "event": [
             {
               "listen": "test",
@@ -615,7 +999,7 @@
           }
         },
         {
-          "name": "21. 400 - Mover Ticket a Columna de otro Tablero",
+          "name": "34. 400 - Mover Ticket a Columna de otro Tablero",
           "event": [
             {
               "listen": "test",
@@ -643,6 +1027,27 @@
             },
             "url": "{{baseUrl}}/api/boards/{{boardId}}/columns/{{newColumnId}}/tickets/{{ticketId}}"
           }
+        },
+        {
+          "name": "35. 400 - Eliminar Ticket desde una Columna a la que no pertenece (Aislamiento)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", function () { pm.response.to.have.status(400); });",
+                  "const json = pm.response.json();",
+                  "pm.test(\"Formato de error { error: string }\", function () { pm.expect(json.error).to.be.a(\"string\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/boards/{{boardId}}/columns/{{columnId}}/tickets/{{ticketId}}"
+          }
         }
       ]
     },
@@ -650,7 +1055,7 @@
       "name": "3. Borrado en cascada",
       "item": [
         {
-          "name": "22. Eliminar Columna \"Doing\" (contiene el Ticket)",
+          "name": "36. Eliminar Columna \"Doing\" (contiene el Ticket)",
           "event": [
             {
               "listen": "test",
@@ -669,7 +1074,7 @@
           }
         },
         {
-          "name": "23. Verificar cascada: el Ticket fue eliminado (404)",
+          "name": "37. Verificar cascada: el Ticket fue eliminado (404)",
           "event": [
             {
               "listen": "test",
@@ -699,7 +1104,7 @@
           }
         },
         {
-          "name": "24. Eliminar Tablero B",
+          "name": "38. Eliminar Tablero B",
           "event": [
             {
               "listen": "test",
@@ -718,7 +1123,7 @@
           }
         },
         {
-          "name": "25. Verificar cascada: la Columna del Tablero B fue eliminada (404)",
+          "name": "39. Verificar cascada: la Columna del Tablero B fue eliminada (404)",
           "event": [
             {
               "listen": "test",
@@ -739,7 +1144,7 @@
           }
         },
         {
-          "name": "26. Eliminar Tablero principal",
+          "name": "40. Eliminar Tablero principal",
           "event": [
             {
               "listen": "test",
@@ -758,7 +1163,7 @@
           }
         },
         {
-          "name": "27. Verificar: el Tablero principal ya no existe (404)",
+          "name": "41. Verificar: el Tablero principal ya no existe (404)",
           "event": [
             {
               "listen": "test",
@@ -776,6 +1181,32 @@
             "method": "GET",
             "header": [],
             "url": "{{baseUrl}}/api/boards/{{boardId}}"
+          }
+        },
+        {
+          "name": "42. Verificar: el Tablero ya no aparece en la lista",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "const json = pm.response.json();",
+                  "pm.test(\"La lista no incluye el tablero eliminado\", function () { pm.expect(json.map(function (b) { return b._id; })).to.not.include(pm.collectionVariables.get(\"boardId\")); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-User-Id",
+                "value": "{{userId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/boards"
           }
         }
       ]

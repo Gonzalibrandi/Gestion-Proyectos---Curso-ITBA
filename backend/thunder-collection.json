@@ -1,46 +1,201 @@
 {
   "client": "Thunder Client",
   "collectionName": "Kanban API - ITBA",
-  "dateExported": "2026-10-15T00:00:00.000Z",
+  "dateExported": "2026-10-19T00:00:00.000Z",
   "version": "1.1",
   "folders": [
+    {
+      "_id": "fld-0",
+      "name": "0. Health y Login",
+      "containerId": "",
+      "created": "2026-10-19T00:00:00.000Z",
+      "sortNum": 10000
+    },
     {
       "_id": "fld-1",
       "name": "1. Flujo principal",
       "containerId": "",
-      "created": "2026-10-15T00:00:00.000Z",
-      "sortNum": 10000
+      "created": "2026-10-19T00:00:00.000Z",
+      "sortNum": 20000
     },
     {
       "_id": "fld-2",
       "name": "2. Validaciones y errores",
       "containerId": "",
-      "created": "2026-10-15T00:00:00.000Z",
-      "sortNum": 20000
+      "created": "2026-10-19T00:00:00.000Z",
+      "sortNum": 30000
     },
     {
       "_id": "fld-3",
       "name": "3. Borrado en cascada",
       "containerId": "",
-      "created": "2026-10-15T00:00:00.000Z",
-      "sortNum": 30000
+      "created": "2026-10-19T00:00:00.000Z",
+      "sortNum": 40000
     }
   ],
   "requests": [
     {
       "_id": "req-01",
       "colId": "col-kanban-itba",
-      "containerId": "fld-1",
-      "name": "01. Crear Tablero",
-      "url": "http://localhost:3000/api/boards",
-      "method": "POST",
+      "containerId": "fld-0",
+      "name": "01. Health check",
+      "url": "http://localhost:3000/api/health",
+      "method": "GET",
       "sortNum": 10000,
-      "created": "2026-10-15T00:00:00.000Z",
-      "modified": "2026-10-15T00:00:00.000Z",
+      "created": "2026-10-19T00:00:00.000Z",
+      "modified": "2026-10-19T00:00:00.000Z",
+      "headers": [],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        },
+        {
+          "type": "json-query",
+          "custom": "json.status",
+          "action": "equal",
+          "value": "ok"
+        }
+      ]
+    },
+    {
+      "_id": "req-02",
+      "colId": "col-kanban-itba",
+      "containerId": "fld-0",
+      "name": "02. 400 - Login sin contraseña",
+      "url": "http://localhost:3000/api/auth/login",
+      "method": "POST",
+      "sortNum": 20000,
+      "created": "2026-10-19T00:00:00.000Z",
+      "modified": "2026-10-19T00:00:00.000Z",
       "headers": [
         {
           "name": "Content-Type",
           "value": "application/json"
+        }
+      ],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "400"
+        },
+        {
+          "type": "json-query",
+          "custom": "json.error",
+          "action": "istype",
+          "value": "string"
+        }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"email\": \"demo@kanban.com\"\n}",
+        "form": []
+      }
+    },
+    {
+      "_id": "req-03",
+      "colId": "col-kanban-itba",
+      "containerId": "fld-0",
+      "name": "03. 401 - Login con credenciales incorrectas",
+      "url": "http://localhost:3000/api/auth/login",
+      "method": "POST",
+      "sortNum": 30000,
+      "created": "2026-10-19T00:00:00.000Z",
+      "modified": "2026-10-19T00:00:00.000Z",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "401"
+        },
+        {
+          "type": "json-query",
+          "custom": "json.error",
+          "action": "istype",
+          "value": "string"
+        }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"email\": \"demo@kanban.com\",\n  \"password\": \"incorrecta\"\n}",
+        "form": []
+      }
+    },
+    {
+      "_id": "req-04",
+      "colId": "col-kanban-itba",
+      "containerId": "fld-0",
+      "name": "04. Login del usuario único",
+      "url": "http://localhost:3000/api/auth/login",
+      "method": "POST",
+      "sortNum": 40000,
+      "created": "2026-10-19T00:00:00.000Z",
+      "modified": "2026-10-19T00:00:00.000Z",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        },
+        {
+          "type": "set-env-var",
+          "custom": "json._id",
+          "action": "setto",
+          "value": "{{userId}}"
+        },
+        {
+          "type": "json-query",
+          "custom": "json.email",
+          "action": "equal",
+          "value": "demo@kanban.com"
+        }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"email\": \"demo@kanban.com\",\n  \"password\": \"demo1234\"\n}",
+        "form": []
+      }
+    },
+    {
+      "_id": "req-05",
+      "colId": "col-kanban-itba",
+      "containerId": "fld-1",
+      "name": "05. Crear Tablero",
+      "url": "http://localhost:3000/api/boards",
+      "method": "POST",
+      "sortNum": 50000,
+      "created": "2026-10-19T00:00:00.000Z",
+      "modified": "2026-10-19T00:00:00.000Z",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "X-User-Id",
+          "value": "{{userId}}"
         }
       ],
       "params": [],
@@ -56,6 +211,12 @@
           "custom": "json._id",
           "action": "setto",
           "value": "{{boardId}}"
+        },
+        {
+          "type": "json-query",
+          "custom": "json.owner",
+          "action": "equal",
+          "value": "{{userId}}"
         }
       ],
       "body": {
@@ -65,15 +226,47 @@
       }
     },
     {
-      "_id": "req-02",
+      "_id": "req-06",
       "colId": "col-kanban-itba",
       "containerId": "fld-1",
-      "name": "02. Crear Columna \"To Do\"",
+      "name": "06. Listar Tableros del usuario",
+      "url": "http://localhost:3000/api/boards",
+      "method": "GET",
+      "sortNum": 60000,
+      "created": "2026-10-19T00:00:00.000Z",
+      "modified": "2026-10-19T00:00:00.000Z",
+      "headers": [
+        {
+          "name": "X-User-Id",
+          "value": "{{userId}}"
+        }
+      ],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        },
+        {
+          "type": "json-query",
+          "custom": "json[0]._id",
+          "action": "equal",
+          "value": "{{boardId}}"
+        }
+      ]
+    },
+    {
+      "_id": "req-07",
+      "colId": "col-kanban-itba",
+      "containerId": "fld-1",
+      "name": "07. Crear Columna \"To Do\"",
       "url": "http://localhost:3000/api/boards/{{boardId}}/columns",
       "method": "POST",
-      "sortNum": 20000,
-      "created": "2026-10-15T00:00:00.000Z",
-      "modified": "2026-10-15T00:00:00.000Z",
+      "sortNum": 70000,
+      "created": "2026-10-19T00:00:00.000Z",
+      "modified": "2026-10-19T00:00:00.000Z",
       "headers": [
         {
           "name": "Content-Type",
@@ -102,15 +295,15 @@
       }
     },
     {
-      "_id": "req-03",
+      "_id": "req-08",
       "colId": "col-kanban-itba",
       "containerId": "fld-1",
-      "name": "03. Crear Columna \"Doing\"",
+      "name": "08. Crear Columna \"Doing\"",
       "url": "http://localhost:3000/api/boards/{{boardId}}/columns",
       "method": "POST",
-      "sortNum": 30000,
-      "created": "2026-10-15T00:00:00.000Z",
-      "modified": "2026-10-15T00:00:00.000Z",
+      "sortNum": 80000,
+      "created": "2026-10-19T00:00:00.000Z",
+      "modified": "2026-10-19T00:00:00.000Z",
       "headers": [
         {
           "name": "Content-Type",
@@ -139,15 +332,15 @@
       }
     },
     {
-      "_id": "req-04",
+      "_id": "req-09",
       "colId": "col-kanban-itba",
       "containerId": "fld-1",
-      "name": "04. Crear Ticket",
+      "name": "09. Crear Ticket con prioridad alta",
       "url": "http://localhost:3000/api/boards/{{boardId}}/columns/{{columnId}}/tickets",
       "method": "POST",
-      "sortNum": 40000,
-      "created": "2026-10-15T00:00:00.000Z",
-      "modified": "2026-10-15T00:00:00.000Z",
+      "sortNum": 90000,
+      "created": "2026-10-19T00:00:00.000Z",
+      "modified": "2026-10-19T00:00:00.000Z",
       "headers": [
         {
           "name": "Content-Type",
@@ -167,24 +360,73 @@
           "custom": "json._id",
           "action": "setto",
           "value": "{{ticketId}}"
+        },
+        {
+          "type": "json-query",
+          "custom": "json.priority",
+          "action": "equal",
+          "value": "high"
         }
       ],
       "body": {
         "type": "json",
-        "raw": "{\n  \"title\": \"Implementar Auth\",\n  \"description\": \"Configurar JWT en el backend\"\n}",
+        "raw": "{\n  \"title\": \"Implementar Auth\",\n  \"description\": \"Configurar JWT en el backend\",\n  \"priority\": \"high\"\n}",
         "form": []
       }
     },
     {
-      "_id": "req-05",
+      "_id": "req-10",
       "colId": "col-kanban-itba",
       "containerId": "fld-1",
-      "name": "05. Obtener Tablero (columnas pobladas)",
+      "name": "10. Crear Ticket sin prioridad (por defecto media)",
+      "url": "http://localhost:3000/api/boards/{{boardId}}/columns/{{columnId}}/tickets",
+      "method": "POST",
+      "sortNum": 100000,
+      "created": "2026-10-19T00:00:00.000Z",
+      "modified": "2026-10-19T00:00:00.000Z",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "201"
+        },
+        {
+          "type": "set-env-var",
+          "custom": "json._id",
+          "action": "setto",
+          "value": "{{secondTicketId}}"
+        },
+        {
+          "type": "json-query",
+          "custom": "json.priority",
+          "action": "equal",
+          "value": "medium"
+        }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"title\": \"Escribir README\"\n}",
+        "form": []
+      }
+    },
+    {
+      "_id": "req-11",
+      "colId": "col-kanban-itba",
+      "containerId": "fld-1",
+      "name": "11. Obtener Tablero (columnas pobladas)",
       "url": "http://localhost:3000/api/boards/{{boardId}}",
       "method": "GET",
-      "sortNum": 50000,
-      "created": "2026-10-15T00:00:00.000Z",
-      "modified": "2026-10-15T00:00:00.000Z",
+      "sortNum": 110000,
+      "created": "2026-10-19T00:00:00.000Z",
+      "modified": "2026-10-19T00:00:00.000Z",
       "headers": [],
       "params": [],
       "tests": [
@@ -203,15 +445,15 @@
       ]
     },
     {
-      "_id": "req-06",
+      "_id": "req-12",
       "colId": "col-kanban-itba",
       "containerId": "fld-1",
-      "name": "06. Actualizar contenido del Ticket",
+      "name": "12. Actualizar contenido y prioridad del Ticket",
       "url": "http://localhost:3000/api/boards/{{boardId}}/columns/{{columnId}}/tickets/{{ticketId}}",
       "method": "PATCH",
-      "sortNum": 60000,
-      "created": "2026-10-15T00:00:00.000Z",
-      "modified": "2026-10-15T00:00:00.000Z",
+      "sortNum": 120000,
+      "created": "2026-10-19T00:00:00.000Z",
+      "modified": "2026-10-19T00:00:00.000Z",
       "headers": [
         {
           "name": "Content-Type",
@@ -225,24 +467,30 @@
           "custom": "",
           "action": "equal",
           "value": "200"
+        },
+        {
+          "type": "json-query",
+          "custom": "json.priority",
+          "action": "equal",
+          "value": "low"
         }
       ],
       "body": {
         "type": "json",
-        "raw": "{\n  \"title\": \"Implementar Auth (Actualizado)\",\n  \"description\": \"JWT + refresh tokens\"\n}",
+        "raw": "{\n  \"title\": \"Implementar Auth (Actualizado)\",\n  \"description\": \"JWT + refresh tokens\",\n  \"priority\": \"low\"\n}",
         "form": []
       }
     },
     {
-      "_id": "req-07",
+      "_id": "req-13",
       "colId": "col-kanban-itba",
       "containerId": "fld-1",
-      "name": "07. Mover Ticket a \"Doing\"",
+      "name": "13. Mover Ticket a \"Doing\"",
       "url": "http://localhost:3000/api/boards/{{boardId}}/columns/{{columnId}}/tickets/{{ticketId}}",
       "method": "PATCH",
-      "sortNum": 70000,
-      "created": "2026-10-15T00:00:00.000Z",
-      "modified": "2026-10-15T00:00:00.000Z",
+      "sortNum": 130000,
+      "created": "2026-10-19T00:00:00.000Z",
+      "modified": "2026-10-19T00:00:00.000Z",
       "headers": [
         {
           "name": "Content-Type",
@@ -271,15 +519,15 @@
       }
     },
     {
-      "_id": "req-08",
+      "_id": "req-14",
       "colId": "col-kanban-itba",
       "containerId": "fld-1",
-      "name": "08. Reintentar Mover Ticket (idempotencia)",
+      "name": "14. Reintentar Mover Ticket (idempotencia)",
       "url": "http://localhost:3000/api/boards/{{boardId}}/columns/{{columnId}}/tickets/{{ticketId}}",
       "method": "PATCH",
-      "sortNum": 80000,
-      "created": "2026-10-15T00:00:00.000Z",
-      "modified": "2026-10-15T00:00:00.000Z",
+      "sortNum": 140000,
+      "created": "2026-10-19T00:00:00.000Z",
+      "modified": "2026-10-19T00:00:00.000Z",
       "headers": [
         {
           "name": "Content-Type",
@@ -308,19 +556,71 @@
       }
     },
     {
-      "_id": "req-09",
+      "_id": "req-15",
+      "colId": "col-kanban-itba",
+      "containerId": "fld-1",
+      "name": "15. Eliminar Ticket",
+      "url": "http://localhost:3000/api/boards/{{boardId}}/columns/{{columnId}}/tickets/{{secondTicketId}}",
+      "method": "DELETE",
+      "sortNum": 150000,
+      "created": "2026-10-19T00:00:00.000Z",
+      "modified": "2026-10-19T00:00:00.000Z",
+      "headers": [],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "204"
+        }
+      ]
+    },
+    {
+      "_id": "req-16",
+      "colId": "col-kanban-itba",
+      "containerId": "fld-1",
+      "name": "16. Verificar: el Ticket eliminado ya no existe (404)",
+      "url": "http://localhost:3000/api/boards/{{boardId}}/columns/{{columnId}}/tickets/{{secondTicketId}}",
+      "method": "DELETE",
+      "sortNum": 160000,
+      "created": "2026-10-19T00:00:00.000Z",
+      "modified": "2026-10-19T00:00:00.000Z",
+      "headers": [],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "404"
+        },
+        {
+          "type": "json-query",
+          "custom": "json.error",
+          "action": "istype",
+          "value": "string"
+        }
+      ]
+    },
+    {
+      "_id": "req-17",
       "colId": "col-kanban-itba",
       "containerId": "fld-2",
-      "name": "09. Crear Tablero B (auxiliar)",
+      "name": "17. Crear Tablero B (auxiliar)",
       "url": "http://localhost:3000/api/boards",
       "method": "POST",
-      "sortNum": 90000,
-      "created": "2026-10-15T00:00:00.000Z",
-      "modified": "2026-10-15T00:00:00.000Z",
+      "sortNum": 170000,
+      "created": "2026-10-19T00:00:00.000Z",
+      "modified": "2026-10-19T00:00:00.000Z",
       "headers": [
         {
           "name": "Content-Type",
           "value": "application/json"
+        },
+        {
+          "name": "X-User-Id",
+          "value": "{{userId}}"
         }
       ],
       "params": [],
@@ -345,15 +645,15 @@
       }
     },
     {
-      "_id": "req-10",
+      "_id": "req-18",
       "colId": "col-kanban-itba",
       "containerId": "fld-2",
-      "name": "10. Crear Columna en Tablero B (auxiliar)",
+      "name": "18. Crear Columna en Tablero B (auxiliar)",
       "url": "http://localhost:3000/api/boards/{{otherBoardId}}/columns",
       "method": "POST",
-      "sortNum": 100000,
-      "created": "2026-10-15T00:00:00.000Z",
-      "modified": "2026-10-15T00:00:00.000Z",
+      "sortNum": 180000,
+      "created": "2026-10-19T00:00:00.000Z",
+      "modified": "2026-10-19T00:00:00.000Z",
       "headers": [
         {
           "name": "Content-Type",
@@ -382,19 +682,123 @@
       }
     },
     {
-      "_id": "req-11",
+      "_id": "req-19",
       "colId": "col-kanban-itba",
       "containerId": "fld-2",
-      "name": "11. 400 - Tablero sin nombre",
+      "name": "19. 401 - Listar Tableros sin X-User-Id",
+      "url": "http://localhost:3000/api/boards",
+      "method": "GET",
+      "sortNum": 190000,
+      "created": "2026-10-19T00:00:00.000Z",
+      "modified": "2026-10-19T00:00:00.000Z",
+      "headers": [],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "401"
+        },
+        {
+          "type": "json-query",
+          "custom": "json.error",
+          "action": "istype",
+          "value": "string"
+        }
+      ]
+    },
+    {
+      "_id": "req-20",
+      "colId": "col-kanban-itba",
+      "containerId": "fld-2",
+      "name": "20. 400 - X-User-Id con formato inválido",
+      "url": "http://localhost:3000/api/boards",
+      "method": "GET",
+      "sortNum": 200000,
+      "created": "2026-10-19T00:00:00.000Z",
+      "modified": "2026-10-19T00:00:00.000Z",
+      "headers": [
+        {
+          "name": "X-User-Id",
+          "value": "abc"
+        }
+      ],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "400"
+        },
+        {
+          "type": "json-query",
+          "custom": "json.error",
+          "action": "istype",
+          "value": "string"
+        }
+      ]
+    },
+    {
+      "_id": "req-21",
+      "colId": "col-kanban-itba",
+      "containerId": "fld-2",
+      "name": "21. 401 - Crear Tablero con un usuario inexistente",
       "url": "http://localhost:3000/api/boards",
       "method": "POST",
-      "sortNum": 110000,
-      "created": "2026-10-15T00:00:00.000Z",
-      "modified": "2026-10-15T00:00:00.000Z",
+      "sortNum": 210000,
+      "created": "2026-10-19T00:00:00.000Z",
+      "modified": "2026-10-19T00:00:00.000Z",
       "headers": [
         {
           "name": "Content-Type",
           "value": "application/json"
+        },
+        {
+          "name": "X-User-Id",
+          "value": "000000000000000000000000"
+        }
+      ],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "401"
+        },
+        {
+          "type": "json-query",
+          "custom": "json.error",
+          "action": "istype",
+          "value": "string"
+        }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"name\": \"Fantasma\"\n}",
+        "form": []
+      }
+    },
+    {
+      "_id": "req-22",
+      "colId": "col-kanban-itba",
+      "containerId": "fld-2",
+      "name": "22. 400 - Tablero sin nombre",
+      "url": "http://localhost:3000/api/boards",
+      "method": "POST",
+      "sortNum": 220000,
+      "created": "2026-10-19T00:00:00.000Z",
+      "modified": "2026-10-19T00:00:00.000Z",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "X-User-Id",
+          "value": "{{userId}}"
         }
       ],
       "params": [],
@@ -419,19 +823,23 @@
       }
     },
     {
-      "_id": "req-12",
+      "_id": "req-23",
       "colId": "col-kanban-itba",
       "containerId": "fld-2",
-      "name": "12. 400 - JSON malformado",
+      "name": "23. 400 - JSON malformado",
       "url": "http://localhost:3000/api/boards",
       "method": "POST",
-      "sortNum": 120000,
-      "created": "2026-10-15T00:00:00.000Z",
-      "modified": "2026-10-15T00:00:00.000Z",
+      "sortNum": 230000,
+      "created": "2026-10-19T00:00:00.000Z",
+      "modified": "2026-10-19T00:00:00.000Z",
       "headers": [
         {
           "name": "Content-Type",
           "value": "application/json"
+        },
+        {
+          "name": "X-User-Id",
+          "value": "{{userId}}"
         }
       ],
       "params": [],
@@ -456,15 +864,15 @@
       }
     },
     {
-      "_id": "req-13",
+      "_id": "req-24",
       "colId": "col-kanban-itba",
       "containerId": "fld-2",
-      "name": "13. 400 - ID de Tablero con formato inválido",
+      "name": "24. 400 - ID de Tablero con formato inválido",
       "url": "http://localhost:3000/api/boards/123",
       "method": "GET",
-      "sortNum": 130000,
-      "created": "2026-10-15T00:00:00.000Z",
-      "modified": "2026-10-15T00:00:00.000Z",
+      "sortNum": 240000,
+      "created": "2026-10-19T00:00:00.000Z",
+      "modified": "2026-10-19T00:00:00.000Z",
       "headers": [],
       "params": [],
       "tests": [
@@ -483,15 +891,15 @@
       ]
     },
     {
-      "_id": "req-14",
+      "_id": "req-25",
       "colId": "col-kanban-itba",
       "containerId": "fld-2",
-      "name": "14. 404 - Tablero inexistente",
+      "name": "25. 404 - Tablero inexistente",
       "url": "http://localhost:3000/api/boards/000000000000000000000000",
       "method": "GET",
-      "sortNum": 140000,
-      "created": "2026-10-15T00:00:00.000Z",
-      "modified": "2026-10-15T00:00:00.000Z",
+      "sortNum": 250000,
+      "created": "2026-10-19T00:00:00.000Z",
+      "modified": "2026-10-19T00:00:00.000Z",
       "headers": [],
       "params": [],
       "tests": [
@@ -510,15 +918,15 @@
       ]
     },
     {
-      "_id": "req-15",
+      "_id": "req-26",
       "colId": "col-kanban-itba",
       "containerId": "fld-2",
-      "name": "15. 404 - Columna en Tablero inexistente (Parent Check)",
+      "name": "26. 404 - Columna en Tablero inexistente (Parent Check)",
       "url": "http://localhost:3000/api/boards/000000000000000000000000/columns",
       "method": "POST",
-      "sortNum": 150000,
-      "created": "2026-10-15T00:00:00.000Z",
-      "modified": "2026-10-15T00:00:00.000Z",
+      "sortNum": 260000,
+      "created": "2026-10-19T00:00:00.000Z",
+      "modified": "2026-10-19T00:00:00.000Z",
       "headers": [
         {
           "name": "Content-Type",
@@ -547,15 +955,15 @@
       }
     },
     {
-      "_id": "req-16",
+      "_id": "req-27",
       "colId": "col-kanban-itba",
       "containerId": "fld-2",
-      "name": "16. 400 - Ticket sin título",
+      "name": "27. 400 - Ticket sin título",
       "url": "http://localhost:3000/api/boards/{{boardId}}/columns/{{columnId}}/tickets",
       "method": "POST",
-      "sortNum": 160000,
-      "created": "2026-10-15T00:00:00.000Z",
-      "modified": "2026-10-15T00:00:00.000Z",
+      "sortNum": 270000,
+      "created": "2026-10-19T00:00:00.000Z",
+      "modified": "2026-10-19T00:00:00.000Z",
       "headers": [
         {
           "name": "Content-Type",
@@ -584,15 +992,52 @@
       }
     },
     {
-      "_id": "req-17",
+      "_id": "req-28",
       "colId": "col-kanban-itba",
       "containerId": "fld-2",
-      "name": "17. 404 - Ticket en Columna inexistente (Parent Check)",
+      "name": "28. 400 - Ticket con prioridad inválida",
+      "url": "http://localhost:3000/api/boards/{{boardId}}/columns/{{columnId}}/tickets",
+      "method": "POST",
+      "sortNum": 280000,
+      "created": "2026-10-19T00:00:00.000Z",
+      "modified": "2026-10-19T00:00:00.000Z",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "400"
+        },
+        {
+          "type": "json-query",
+          "custom": "json.error",
+          "action": "istype",
+          "value": "string"
+        }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"title\": \"Urgente\",\n  \"priority\": \"urgent\"\n}",
+        "form": []
+      }
+    },
+    {
+      "_id": "req-29",
+      "colId": "col-kanban-itba",
+      "containerId": "fld-2",
+      "name": "29. 404 - Ticket en Columna inexistente (Parent Check)",
       "url": "http://localhost:3000/api/boards/{{boardId}}/columns/000000000000000000000000/tickets",
       "method": "POST",
-      "sortNum": 170000,
-      "created": "2026-10-15T00:00:00.000Z",
-      "modified": "2026-10-15T00:00:00.000Z",
+      "sortNum": 290000,
+      "created": "2026-10-19T00:00:00.000Z",
+      "modified": "2026-10-19T00:00:00.000Z",
       "headers": [
         {
           "name": "Content-Type",
@@ -621,15 +1066,15 @@
       }
     },
     {
-      "_id": "req-18",
+      "_id": "req-30",
       "colId": "col-kanban-itba",
       "containerId": "fld-2",
-      "name": "18. 400 - Ticket en Columna de otro Tablero (Aislamiento)",
+      "name": "30. 400 - Ticket en Columna de otro Tablero (Aislamiento)",
       "url": "http://localhost:3000/api/boards/{{boardId}}/columns/{{otherColumnId}}/tickets",
       "method": "POST",
-      "sortNum": 180000,
-      "created": "2026-10-15T00:00:00.000Z",
-      "modified": "2026-10-15T00:00:00.000Z",
+      "sortNum": 300000,
+      "created": "2026-10-19T00:00:00.000Z",
+      "modified": "2026-10-19T00:00:00.000Z",
       "headers": [
         {
           "name": "Content-Type",
@@ -658,15 +1103,15 @@
       }
     },
     {
-      "_id": "req-19",
+      "_id": "req-31",
       "colId": "col-kanban-itba",
       "containerId": "fld-2",
-      "name": "19. 400 - Ticket desde una Columna a la que no pertenece (Aislamiento)",
+      "name": "31. 400 - Ticket desde una Columna a la que no pertenece (Aislamiento)",
       "url": "http://localhost:3000/api/boards/{{boardId}}/columns/{{columnId}}/tickets/{{ticketId}}",
       "method": "PATCH",
-      "sortNum": 190000,
-      "created": "2026-10-15T00:00:00.000Z",
-      "modified": "2026-10-15T00:00:00.000Z",
+      "sortNum": 310000,
+      "created": "2026-10-19T00:00:00.000Z",
+      "modified": "2026-10-19T00:00:00.000Z",
       "headers": [
         {
           "name": "Content-Type",
@@ -695,15 +1140,52 @@
       }
     },
     {
-      "_id": "req-20",
+      "_id": "req-32",
       "colId": "col-kanban-itba",
       "containerId": "fld-2",
-      "name": "20. 400 - Mover Ticket con newColumnId inválido",
+      "name": "32. 400 - Actualizar Ticket con prioridad inválida",
       "url": "http://localhost:3000/api/boards/{{boardId}}/columns/{{newColumnId}}/tickets/{{ticketId}}",
       "method": "PATCH",
-      "sortNum": 200000,
-      "created": "2026-10-15T00:00:00.000Z",
-      "modified": "2026-10-15T00:00:00.000Z",
+      "sortNum": 320000,
+      "created": "2026-10-19T00:00:00.000Z",
+      "modified": "2026-10-19T00:00:00.000Z",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "400"
+        },
+        {
+          "type": "json-query",
+          "custom": "json.error",
+          "action": "istype",
+          "value": "string"
+        }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"priority\": \"urgent\"\n}",
+        "form": []
+      }
+    },
+    {
+      "_id": "req-33",
+      "colId": "col-kanban-itba",
+      "containerId": "fld-2",
+      "name": "33. 400 - Mover Ticket con newColumnId inválido",
+      "url": "http://localhost:3000/api/boards/{{boardId}}/columns/{{newColumnId}}/tickets/{{ticketId}}",
+      "method": "PATCH",
+      "sortNum": 330000,
+      "created": "2026-10-19T00:00:00.000Z",
+      "modified": "2026-10-19T00:00:00.000Z",
       "headers": [
         {
           "name": "Content-Type",
@@ -732,15 +1214,15 @@
       }
     },
     {
-      "_id": "req-21",
+      "_id": "req-34",
       "colId": "col-kanban-itba",
       "containerId": "fld-2",
-      "name": "21. 400 - Mover Ticket a Columna de otro Tablero",
+      "name": "34. 400 - Mover Ticket a Columna de otro Tablero",
       "url": "http://localhost:3000/api/boards/{{boardId}}/columns/{{newColumnId}}/tickets/{{ticketId}}",
       "method": "PATCH",
-      "sortNum": 210000,
-      "created": "2026-10-15T00:00:00.000Z",
-      "modified": "2026-10-15T00:00:00.000Z",
+      "sortNum": 340000,
+      "created": "2026-10-19T00:00:00.000Z",
+      "modified": "2026-10-19T00:00:00.000Z",
       "headers": [
         {
           "name": "Content-Type",
@@ -769,15 +1251,42 @@
       }
     },
     {
-      "_id": "req-22",
+      "_id": "req-35",
+      "colId": "col-kanban-itba",
+      "containerId": "fld-2",
+      "name": "35. 400 - Eliminar Ticket desde una Columna a la que no pertenece (Aislamiento)",
+      "url": "http://localhost:3000/api/boards/{{boardId}}/columns/{{columnId}}/tickets/{{ticketId}}",
+      "method": "DELETE",
+      "sortNum": 350000,
+      "created": "2026-10-19T00:00:00.000Z",
+      "modified": "2026-10-19T00:00:00.000Z",
+      "headers": [],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "400"
+        },
+        {
+          "type": "json-query",
+          "custom": "json.error",
+          "action": "istype",
+          "value": "string"
+        }
+      ]
+    },
+    {
+      "_id": "req-36",
       "colId": "col-kanban-itba",
       "containerId": "fld-3",
-      "name": "22. Eliminar Columna \"Doing\" (contiene el Ticket)",
+      "name": "36. Eliminar Columna \"Doing\" (contiene el Ticket)",
       "url": "http://localhost:3000/api/boards/{{boardId}}/columns/{{newColumnId}}",
       "method": "DELETE",
-      "sortNum": 220000,
-      "created": "2026-10-15T00:00:00.000Z",
-      "modified": "2026-10-15T00:00:00.000Z",
+      "sortNum": 360000,
+      "created": "2026-10-19T00:00:00.000Z",
+      "modified": "2026-10-19T00:00:00.000Z",
       "headers": [],
       "params": [],
       "tests": [
@@ -790,15 +1299,15 @@
       ]
     },
     {
-      "_id": "req-23",
+      "_id": "req-37",
       "colId": "col-kanban-itba",
       "containerId": "fld-3",
-      "name": "23. Verificar cascada: el Ticket fue eliminado (404)",
+      "name": "37. Verificar cascada: el Ticket fue eliminado (404)",
       "url": "http://localhost:3000/api/boards/{{boardId}}/columns/{{columnId}}/tickets/{{ticketId}}",
       "method": "PATCH",
-      "sortNum": 230000,
-      "created": "2026-10-15T00:00:00.000Z",
-      "modified": "2026-10-15T00:00:00.000Z",
+      "sortNum": 370000,
+      "created": "2026-10-19T00:00:00.000Z",
+      "modified": "2026-10-19T00:00:00.000Z",
       "headers": [
         {
           "name": "Content-Type",
@@ -827,15 +1336,15 @@
       }
     },
     {
-      "_id": "req-24",
+      "_id": "req-38",
       "colId": "col-kanban-itba",
       "containerId": "fld-3",
-      "name": "24. Eliminar Tablero B",
+      "name": "38. Eliminar Tablero B",
       "url": "http://localhost:3000/api/boards/{{otherBoardId}}",
       "method": "DELETE",
-      "sortNum": 240000,
-      "created": "2026-10-15T00:00:00.000Z",
-      "modified": "2026-10-15T00:00:00.000Z",
+      "sortNum": 380000,
+      "created": "2026-10-19T00:00:00.000Z",
+      "modified": "2026-10-19T00:00:00.000Z",
       "headers": [],
       "params": [],
       "tests": [
@@ -848,15 +1357,15 @@
       ]
     },
     {
-      "_id": "req-25",
+      "_id": "req-39",
       "colId": "col-kanban-itba",
       "containerId": "fld-3",
-      "name": "25. Verificar cascada: la Columna del Tablero B fue eliminada (404)",
+      "name": "39. Verificar cascada: la Columna del Tablero B fue eliminada (404)",
       "url": "http://localhost:3000/api/boards/{{boardId}}/columns/{{otherColumnId}}",
       "method": "DELETE",
-      "sortNum": 250000,
-      "created": "2026-10-15T00:00:00.000Z",
-      "modified": "2026-10-15T00:00:00.000Z",
+      "sortNum": 390000,
+      "created": "2026-10-19T00:00:00.000Z",
+      "modified": "2026-10-19T00:00:00.000Z",
       "headers": [],
       "params": [],
       "tests": [
@@ -875,15 +1384,15 @@
       ]
     },
     {
-      "_id": "req-26",
+      "_id": "req-40",
       "colId": "col-kanban-itba",
       "containerId": "fld-3",
-      "name": "26. Eliminar Tablero principal",
+      "name": "40. Eliminar Tablero principal",
       "url": "http://localhost:3000/api/boards/{{boardId}}",
       "method": "DELETE",
-      "sortNum": 260000,
-      "created": "2026-10-15T00:00:00.000Z",
-      "modified": "2026-10-15T00:00:00.000Z",
+      "sortNum": 400000,
+      "created": "2026-10-19T00:00:00.000Z",
+      "modified": "2026-10-19T00:00:00.000Z",
       "headers": [],
       "params": [],
       "tests": [
@@ -896,15 +1405,15 @@
       ]
     },
     {
-      "_id": "req-27",
+      "_id": "req-41",
       "colId": "col-kanban-itba",
       "containerId": "fld-3",
-      "name": "27. Verificar: el Tablero principal ya no existe (404)",
+      "name": "41. Verificar: el Tablero principal ya no existe (404)",
       "url": "http://localhost:3000/api/boards/{{boardId}}",
       "method": "GET",
-      "sortNum": 270000,
-      "created": "2026-10-15T00:00:00.000Z",
-      "modified": "2026-10-15T00:00:00.000Z",
+      "sortNum": 410000,
+      "created": "2026-10-19T00:00:00.000Z",
+      "modified": "2026-10-19T00:00:00.000Z",
       "headers": [],
       "params": [],
       "tests": [
@@ -919,6 +1428,32 @@
           "custom": "json.error",
           "action": "istype",
           "value": "string"
+        }
+      ]
+    },
+    {
+      "_id": "req-42",
+      "colId": "col-kanban-itba",
+      "containerId": "fld-3",
+      "name": "42. Verificar: el Tablero ya no aparece en la lista",
+      "url": "http://localhost:3000/api/boards",
+      "method": "GET",
+      "sortNum": 420000,
+      "created": "2026-10-19T00:00:00.000Z",
+      "modified": "2026-10-19T00:00:00.000Z",
+      "headers": [
+        {
+          "name": "X-User-Id",
+          "value": "{{userId}}"
+        }
+      ],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
         }
       ]
     }

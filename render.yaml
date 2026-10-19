@@ -1,0 +1,24 @@
+# Blueprint de Render para el backend (https://render.com/docs/blueprint-spec)
+# Render lo detecta en la raíz del repositorio: New + > Blueprint > seleccionar este repo.
+services:
+  - type: web
+    name: kanban-api-itba
+    runtime: node
+    plan: free
+    rootDir: backend # El backend vive en una subcarpeta del monorepo
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      # sync: false -> Render pide el valor al crear el servicio (no se versionan secretos)
+      - key: MONGO_URI
+        sync: false
+      - key: CORS_ORIGIN
+        sync: false
+      - key: DEMO_USER_NAME
+        sync: false
+      - key: DEMO_USER_EMAIL
+        sync: false
+      - key: DEMO_USER_PASSWORD
+        sync: false

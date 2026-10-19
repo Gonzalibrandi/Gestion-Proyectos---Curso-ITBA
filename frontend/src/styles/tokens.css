@@ -1,0 +1,54 @@
+/*
+  Tokens de diseño — Tema "Minimalismo Developer" (requerimientos.md §10.1)
+  Es el ÚNICO archivo del proyecto con colores escritos a mano: los componentes solo usan var(--token).
+  Light en :root, Dark en :root.dark (la clase la aplica el script de index.html y ThemeProvider).
+*/
+
+:root {
+  color-scheme: light;
+
+  /* Colores de la consigna */
+  --bg-primary: #F9FAFB;
+  --bg-card: #FFFFFF;
+  --text-primary: #111827;
+  --accent-color: #4F46E5;
+
+  /* Colores derivados */
+  --text-secondary: #6B7280;
+  --border-color: #E5E7EB;
+  --danger-color: #DC2626;
+  --text-on-accent: #FFFFFF;
+  --shadow-card: 0 1px 2px rgb(17 24 39 / 0.06);
+
+  /* Tipografía */
+  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, 'Cascadia Code', Consolas, monospace;
+
+  /* Espaciado, bordes y movimiento (no son colores, pero se centralizan igual) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --transition-theme: 150ms ease;
+}
+
+:root.dark {
+  color-scheme: dark;
+
+  /* Colores de la consigna */
+  --bg-primary: #0F172A;
+  --bg-card: #1E293B;
+  --text-primary: #F8FAFC;
+  --accent-color: #818CF8;
+
+  /* Colores derivados */
+  --text-secondary: #94A3B8;
+  --border-color: #334155;
+  --danger-color: #F87171;
+  --text-on-accent: #0F172A;
+  --shadow-card: none;
+}

@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kanban ITBA</title>
+    <!--
+      Script anti-parpadeo del tema (requerimientos.md §10.2): aplica la clase .dark en <html>
+      ANTES del primer pintado y de que React se monte.
+      La clave 'kanban.theme' debe coincidir con STORAGE_KEY de src/context/ThemeProvider.jsx.
+    -->
+    <script>
+      (function () {
+        var stored = null
+        try {
+          stored = localStorage.getItem('kanban.theme')
+        } catch (e) {
+          // Sin acceso a localStorage: se sigue la preferencia del sistema
+        }
+        var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (stored === 'dark' || (stored !== 'light' && prefersDark)) {
+          document.documentElement.classList.add('dark')
+        }
+      })()
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

@@ -11,9 +11,11 @@ export function ColumnView({ column, onAddTicket, onEditTicket, onDeleteTicket, 
       <header className={styles.header}>
         <h3 className={styles.title}>{column.name}</h3>
         <span className={styles.count}>{tickets.length}</span>
-        <Button variant="ghost" size="sm" onClick={() => onDelete(column)} aria-label={`Eliminar columna ${column.name}`}>
-          ×
-        </Button>
+        {onDelete && (
+          <Button variant="ghost" size="sm" onClick={() => onDelete(column)} aria-label={`Eliminar columna ${column.name}`}>
+            ×
+          </Button>
+        )}
       </header>
 
       <div className={styles.ticketList}>
@@ -23,9 +25,11 @@ export function ColumnView({ column, onAddTicket, onEditTicket, onDeleteTicket, 
         ))}
       </div>
 
-      <Button variant="secondary" size="sm" onClick={() => onAddTicket(column)}>
-        + Ticket
-      </Button>
+      {onAddTicket && (
+        <Button variant="secondary" size="sm" onClick={() => onAddTicket(column)}>
+          + Ticket
+        </Button>
+      )}
     </section>
   )
 }

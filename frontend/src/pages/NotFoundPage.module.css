@@ -1,20 +1,24 @@
-.container {
+.page {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 80vh;
-  gap: var(--space-4);
+  gap: var(--space-3);
+  min-height: 100vh;
+  padding: var(--space-6);
   text-align: center;
 }
 
-h1 {
-  font-size: 4rem;
-  color: var(--text-primary);
-  margin: 0;
+.code {
+  font-family: var(--font-mono);
+  font-size: 3rem;
+  color: var(--accent-color);
 }
 
-p {
-  color: var(--text-secondary);
-  margin-bottom: var(--space-4);
+.title {
+  font-size: 1.25rem;
+}
+
+.link {
+  color: var(--accent-color);
 }

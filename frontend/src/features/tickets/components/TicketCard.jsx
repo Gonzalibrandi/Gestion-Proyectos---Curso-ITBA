@@ -18,12 +18,16 @@ export function TicketCard({ ticket, onEdit, onDelete }) {
       <footer className={styles.footer}>
         <code className={styles.id}>#{ticket._id.slice(-6)}</code>
         <div className={styles.actions}>
-          <Button variant="ghost" size="sm" onClick={() => onEdit(ticket)} aria-label={`Editar ${ticket.title}`}>
-            Editar
-          </Button>
-          <Button variant="ghost" size="sm" onClick={() => onDelete(ticket)} aria-label={`Eliminar ${ticket.title}`}>
-            Eliminar
-          </Button>
+          {onEdit && (
+            <Button variant="ghost" size="sm" onClick={() => onEdit(ticket)} aria-label={`Editar ${ticket.title}`}>
+              Editar
+            </Button>
+          )}
+          {onDelete && (
+            <Button variant="ghost" size="sm" onClick={() => onDelete(ticket)} aria-label={`Eliminar ${ticket.title}`}>
+              Eliminar
+            </Button>
+          )}
         </div>
       </footer>
     </article>

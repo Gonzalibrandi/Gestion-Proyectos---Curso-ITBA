@@ -1,29 +1,47 @@
-.container {
+.page {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  min-height: 80vh;
+  justify-content: center;
+  min-height: 100vh;
+  padding: var(--space-6);
 }
 
-.form {
-  background-color: var(--bg-card);
-  border: 1px solid var(--border-color);
-  padding: var(--space-8);
-  border-radius: var(--radius-md);
+.toolbar {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
+}
+
+.card {
   display: flex;
   flex-direction: column;
   gap: var(--space-6);
   width: 100%;
-  max-width: 400px;
+  max-width: 380px;
+  padding: var(--space-8);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background-color: var(--bg-card);
   box-shadow: var(--shadow-card);
 }
 
-h1 {
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
   text-align: center;
-  color: var(--text-primary);
-  margin-bottom: var(--space-4);
 }
 
-.submitBtn {
-  margin-top: var(--space-4);
+.brand {
+  font-family: var(--font-mono);
+  font-weight: 600;
+}
+
+.accent {
+  color: var(--accent-color);
+}
+
+.title {
+  font-size: 1.25rem;
 }

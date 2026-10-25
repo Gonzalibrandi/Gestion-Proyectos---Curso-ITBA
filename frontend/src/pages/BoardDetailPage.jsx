@@ -1,138 +1,52 @@
-import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { boardService } from '../api/boardService';
-import { Spinner } from '../components/Spinner';
-import { useCreateColumn, useDeleteColumn } from '../features/columns/hooks';
-import { useCreateTicket, useDeleteTicket } from '../features/tickets/hooks';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { columnSchema } from '../features/columns/schemas';
-import { ticketSchema } from '../features/tickets/schemas';
-import { Button } from '../components/Button';
-import { Input } from '../components/Input';
-import styles from './BoardDetailPage.module.css';
+import { Link, useParams } from 'react-router-dom'
+import { Button } from '../components/Button'
+import { Spinner } from '../components/Spinner'
+import { StateMessage } from '../components/StateMessage'
+import { BoardColumns } from '../features/boards/components/BoardColumns'
+import { BoardHeader } from '../features/boards/components/BoardHeader'
+import { useBoard } from '../features/boards/hooks/useBoard'
+import styles from './BoardDetailPage.module.css'
 
-const BoardDetailPage = () => {
-  const { boardId } = useParams();
-  const [modalType, setModalType] = useState(null); // 'column' | 'ticket'
-  const [activeColumnId, setActiveColumnId] = useState(null);
+// Mensaje según el error de GET /boards/:boardId (§5: nunca una pantalla en blanco)
+const errorTitle = (status) => {
+  if (status === 400) return 'La dirección del tablero no es válida'
+  if (status === 404) return 'El tablero no existe'
+  return 'No se pudo cargar el tablero'
+}
 
-  const { data: board, isLoading } = useQuery({
-    queryKey: ['board', boardId],
-    queryFn: () => boardService.getBoardById(boardId),
-  });
+export default function BoardDetailPage() {
+  const { boardId } = useParams()
+  const boardQuery = useBoard(boardId)
 
-  const { mutate: createColumn } = useCreateColumn(boardId);
-  const { mutate: deleteColumn } = useDeleteColumn(boardId);
-  const { mutate: createTicket } = useCreateTicket(boardId);
-  const { mutate: deleteTicket } = useDeleteTicket(boardId);
+  if (boardQuery.isPending) {
+    return (
+      <div className={styles.center}>
+        <Spinner />
+      </div>
+    )
+  }
 
-  const { register: regCol, handleSubmit: submitCol, reset: resetCol, formState: { errors: errCol } } = useForm({
-    resolver: zodResolver(columnSchema),
-  });
+  if (boardQuery.isError) {
+    const { status, message } = boardQuery.error
+    const canRetry = status === 0 || status >= 500
+    return (
+      <StateMessage tone="error" title={errorTitle(status)} message={message}>
+        {canRetry && (
+          <Button variant="secondary" onClick={() => boardQuery.refetch()}>
+            Reintentar
+          </Button>
+        )}
+        <Link to="/boards">Volver a tableros</Link>
+      </StateMessage>
+    )
+  }
 
-  const { register: regTck, handleSubmit: submitTck, reset: resetTck, formState: { errors: errTck } } = useForm({
-    resolver: zodResolver(ticketSchema),
-  });
-
-  const handleCreateColumn = (data) => {
-    createColumn(data, { onSuccess: () => setModalType(null) });
-    resetCol();
-  };
-
-  const handleCreateTicket = (data) => {
-    createTicket({ columnId: activeColumnId, ...data }, { onSuccess: () => setModalType(null) });
-    resetTck();
-  };
-
-  if (isLoading) return <div className={styles.center}><Spinner /></div>;
+  const board = boardQuery.data
 
   return (
-    <div className={styles.page}>
-      <div style={{ padding: 'var(--space-6)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <h1>{board?.name}</h1>
-          <p>{board?.description}</p>
-        </div>
-        <Button variant="primary" onClick={() => setModalType('column')}>Añadir Columna</Button>
-      </div>
-
-      <div style={{ display: 'flex', gap: 'var(--space-4)', padding: 'var(--space-6)', overflowX: 'auto' }}>
-        {board?.columns?.map(col => (
-          <div key={col._id} style={{ minWidth: '300px', background: 'var(--bg-primary)', padding: 'var(--space-4)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--space-4)' }}>
-              <h3>{col.name}</h3>
-              <Button variant="danger" size="small" onClick={() => {
-                if(window.confirm('¿Eliminar columna?')) deleteColumn({ columnId: col._id });
-              }}>×</Button>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-              {col.tickets?.map(t => (
-                <div key={t._id} style={{ background: 'var(--bg-card)', padding: 'var(--space-2)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', position: 'relative' }}>
-                  <strong>{t.title}</strong>
-                  <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{t.description}</p>
-                  <Button
-                    variant="danger"
-                    style={{ position: 'absolute', right: '5px', top: '5px', fontSize: '0.7rem', padding: '2px 5px' }}
-                    onClick={() => deleteTicket({ columnId: col._id, ticketId: t._id })}
-                  >
-                    Eliminar
-                  </Button>
-                </div>
-              ))}
-            </div>
-            <Button
-              variant="secondary"
-              style={{ marginTop: 'var(--space-4)', width: '100%' }}
-              onClick={() => { setActiveColumnId(col._id); setModalType('ticket'); }}
-            >
-              + Ticket
-            </Button>
-          </div>
-        ))}
-      </div>
-
-      {modalType === 'column' && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.modal}>
-            <h2>Nueva Columna</h2>
-            <form onSubmit={submitCol(handleCreateColumn)} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <Input label="Nombre" {...regCol('name')} error={errCol.name?.message} />
-              <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
-                <Button variant="secondary" onClick={() => setModalType(null)}>Cancelar</Button>
-                <Button type="submit" variant="primary">Guardar</Button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {modalType === 'ticket' && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.modal}>
-            <h2>Nuevo Ticket</h2>
-            <form onSubmit={submitTck(handleCreateTicket)} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <Input label="Título" {...regTck('title')} error={errTck.title?.message} />
-              <Input label="Descripción" {...regTck('description')} />
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                <label style={{ fontSize: '0.8rem' }}>Prioridad</label>
-                <select {...regTck('priority')} style={{ padding: 'var(--space-2)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: 'var(--bg-card)', color: 'var(--text-primary)' }}>
-                  <option value="low">Baja</option>
-                  <option value="medium">Media</option>
-                  <option value="high">Alta</option>
-                </select>
-              </div>
-              <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
-                <Button variant="secondary" onClick={() => setModalType(null)}>Cancelar</Button>
-                <Button type="submit" variant="primary">Guardar</Button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
-
-export default BoardDetailPage;
+    <>
+      <BoardHeader board={board} />
+      <BoardColumns columns={board.columns} />
+    </>
+  )
+}

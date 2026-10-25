@@ -14,10 +14,12 @@ export function BoardHeader({ board, onAddColumn, onDelete }) {
         {board.description && <p className={styles.description}>{board.description}</p>}
       </div>
       <div className={styles.actions}>
-        <Button variant="secondary" onClick={onDelete}>
-          Eliminar tablero
-        </Button>
-        <Button onClick={onAddColumn}>+ Columna</Button>
+        {onDelete && (
+          <Button variant="secondary" onClick={onDelete}>
+            Eliminar tablero
+          </Button>
+        )}
+        {onAddColumn && <Button onClick={onAddColumn}>+ Columna</Button>}
       </div>
     </header>
   )

@@ -8,7 +8,14 @@ import { ThemeProvider } from './context/ThemeProvider'
 import { AuthProvider } from './context/AuthProvider'
 import { AppRouter } from './routes/router'
 
-const queryClient = new QueryClient()
+// Solo se reintentan las fallas de red (status 0) y los 5xx; un 4xx no cambia al reintentar
+const shouldRetry = (failureCount, error) => (error?.status === 0 || error?.status >= 500) && failureCount < 2
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: { retry: shouldRetry, refetchOnWindowFocus: false },
+  },
+})
 
 // MSW solo en desarrollo y con VITE_USE_MOCKS=true (requerimientos.md §11.1).
 // En el build de producción import.meta.env.DEV es false: el import dinámico se elimina y MSW no se incluye.

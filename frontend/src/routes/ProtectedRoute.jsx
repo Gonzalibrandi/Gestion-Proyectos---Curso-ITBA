@@ -1,12 +1,13 @@
-import { Navigate, useLocation } from 'react-router-dom'
+import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 
-// Sin sesión redirige a /login y guarda la ruta original para volver después del login
-export const ProtectedRoute = ({ children }) => {
+// Ruta de layout protegida (requerimientos.md §5): sin sesión redirige a /login
+// y guarda la ruta original en location.state.from para volver después del login
+export function ProtectedRoute() {
   const { user } = useAuth()
   const location = useLocation()
 
   if (!user) return <Navigate to="/login" replace state={{ from: location }} />
 
-  return children
+  return <Outlet />
 }

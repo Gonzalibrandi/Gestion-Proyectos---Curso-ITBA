@@ -16,9 +16,11 @@ export function BoardCard({ board, to, onDelete }) {
       <p className={styles.description}>{board.description || 'Sin descripción'}</p>
       <footer className={styles.footer}>
         <code className={styles.meta}>creado {formatDate(board.createdAt)}</code>
-        <Button variant="ghost" size="sm" onClick={() => onDelete(board)} aria-label={`Eliminar tablero ${board.name}`}>
-          Eliminar
-        </Button>
+        {onDelete && (
+          <Button variant="ghost" size="sm" onClick={() => onDelete(board)} aria-label={`Eliminar tablero ${board.name}`}>
+            Eliminar
+          </Button>
+        )}
       </footer>
     </article>
   )

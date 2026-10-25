@@ -10,6 +10,8 @@ Aplicación de gestión de proyectos al estilo Kanban, organizada como **monorep
 | Backend (API REST) | Render | https://kanban-api-itba.onrender.com/api ([health check](https://kanban-api-itba.onrender.com/api/health)) |
 | Base de datos | MongoDB Atlas (M0) | — |
 
+**Usuario de prueba:** `demo@kanban.com` / `demo1234`
+
 > El backend usa el plan gratuito de Render: después de 15 minutos sin uso se suspende, y la primera petición puede tardar ~50 s.
 
 ## Estructura del Monorepo

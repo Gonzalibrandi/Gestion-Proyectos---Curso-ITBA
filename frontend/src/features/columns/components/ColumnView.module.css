@@ -11,6 +11,11 @@
   transition: border-color var(--transition-theme);
 }
 
+/* Zona de drop activa mientras se arrastra un ticket encima */
+.over {
+  border-color: var(--accent-color);
+}
+
 .header {
   display: flex;
   align-items: center;

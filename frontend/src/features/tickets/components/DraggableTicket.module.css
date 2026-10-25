@@ -1,0 +1,23 @@
+.draggable {
+  cursor: grab;
+  touch-action: none;
+}
+
+/* El original queda tenue mientras el DragOverlay muestra la copia que se arrastra */
+.dragging {
+  opacity: 0.35;
+}
+
+.handle {
+  flex-shrink: 0;
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  line-height: 1.4;
+  cursor: grab;
+}
+
+.handle:hover {
+  color: var(--accent-color);
+}

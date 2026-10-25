@@ -2,13 +2,15 @@ import { Button } from '../../../components/Button'
 import { PRIORITY_LABELS } from '../priorities'
 import styles from './TicketCard.module.css'
 
-// Tarjeta de ticket (presentacional): sin useEffect ni llamadas a la API
-export function TicketCard({ ticket, onEdit, onDelete }) {
+// Tarjeta de ticket (presentacional): sin useEffect ni llamadas a la API.
+// dragHandle: manija opcional que agrega DraggableTicket para mover el ticket con el teclado.
+export function TicketCard({ ticket, onEdit, onDelete, dragHandle }) {
   const priority = PRIORITY_LABELS[ticket.priority] ? ticket.priority : 'medium'
 
   return (
     <article className={styles.card}>
       <header className={styles.header}>
+        {dragHandle}
         <h4 className={styles.title}>{ticket.title}</h4>
         <span className={`${styles.priority} ${styles[priority]}`}>{PRIORITY_LABELS[priority]}</span>
       </header>

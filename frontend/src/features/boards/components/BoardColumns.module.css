@@ -1,7 +1,11 @@
+/* El tablero ocupa todo el alto disponible y las columnas se estiran hasta abajo.
+   Con muchas columnas hace scroll horizontal; en pantallas muy bajas conserva un alto mínimo. */
 .board {
+  flex: 1;
   display: flex;
-  align-items: flex-start;
+  align-items: stretch;
   gap: var(--space-4);
+  min-height: 360px;
   overflow-x: auto;
-  padding-bottom: var(--space-4);
+  padding-bottom: var(--space-2);
 }

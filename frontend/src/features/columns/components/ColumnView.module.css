@@ -4,6 +4,7 @@
   /* Las columnas se reparten el ancho disponible; con muchas columnas, el tablero hace scroll horizontal */
   flex: 1 1 0;
   min-width: 260px;
+  min-height: 0; /* la columna se estira hasta abajo y su lista de tickets scrollea por dentro */
   gap: var(--space-3);
   padding: var(--space-3);
   border: 1px solid var(--border-color);
@@ -35,11 +36,20 @@
   color: var(--text-secondary);
 }
 
+/* Ocupa el espacio libre de la columna; si hay más tickets de los que entran, scrollea
+   y el botón "+ Ticket" queda siempre visible abajo */
 .ticketList {
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
   min-height: 48px;
+  overflow-y: auto;
+  padding: 2px; /* deja ver el contorno de foco de las tarjetas */
+}
+
+.ticketList > * {
+  flex-shrink: 0;
 }
 
 .empty {

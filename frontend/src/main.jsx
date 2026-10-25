@@ -1,12 +1,12 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { Toaster } from 'sonner'
 import './styles/tokens.css'
 import './styles/global.css'
 import { ThemeProvider } from './context/ThemeProvider'
 import { AuthProvider } from './context/AuthProvider'
 import { AppRouter } from './routes/router'
+import { AppToaster } from './components/AppToaster'
 
 // Solo se reintentan las fallas de red (status 0) y los 5xx; un 4xx no cambia al reintentar
 const shouldRetry = (failureCount, error) => (error?.status === 0 || error?.status >= 500) && failureCount < 2
@@ -32,7 +32,7 @@ enableMocking().then(() => {
         <ThemeProvider>
           <AuthProvider>
             <AppRouter />
-            <Toaster position="top-right" />
+            <AppToaster />
           </AuthProvider>
         </ThemeProvider>
       </QueryClientProvider>

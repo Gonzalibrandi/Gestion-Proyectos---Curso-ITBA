@@ -19,7 +19,7 @@ Construir una **Single Page Application (SPA)** Kanban que consuma la API REST d
 | Estado global de UI | Context API | Solo para **tema** y **sesión**. Nada de Redux, Zustand ni similares. |
 | Formularios | React Hook Form + Zod (`@hookform/resolvers`) | Todo formulario usa un esquema Zod. |
 | Drag & Drop | `@dnd-kit/core` | Con `PointerSensor` y `KeyboardSensor` (accesible con teclado). |
-| Notificaciones | `sonner` (Toasts) | Un único `<Toaster />` montado en la raíz. |
+| Notificaciones | `sonner` (Toasts) | Un único `<Toaster />` montado en la raíz (`AppToaster`), que sigue el tema actual de la app. |
 | Mocks | MSW 2 (Mock Service Worker) | Solo en desarrollo, activado por variable de entorno. |
 | Estilos | CSS Modules + CSS Custom Properties | Sin Tailwind, Bootstrap ni librerías de componentes. |
 | Lint | `oxlint` (incluido en la plantilla de Vite) | `npm run lint` tiene que terminar sin errores antes de cerrar cada fase. |
@@ -45,7 +45,7 @@ frontend/
     │   ├── columnService.js
     │   └── ticketService.js
     ├── components/            # UI reutilizable y agnóstica del dominio (Button, Input, Modal, ConfirmDialog,
-    │                          # Form, Spinner, StateMessage, AppHeader, ThemeToggle)
+    │                          # Form, Spinner, StateMessage, AppHeader, AppToaster, ThemeToggle)
     ├── features/              # Módulos por dominio
     │   ├── auth/              # LoginForm, useLogin y esquema del login
     │   ├── boards/            # Componentes, hooks de queries/mutations, esquemas Zod y queryKeys.js

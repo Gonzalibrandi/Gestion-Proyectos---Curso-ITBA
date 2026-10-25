@@ -1,13 +1,12 @@
-import React from 'react';
-import { Navigate } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth';
-import styles from './ProtectedRoute.module.css';
+import { Navigate, useLocation } from 'react-router-dom'
+import { useAuth } from '../hooks/useAuth'
 
+// Sin sesión redirige a /login y guarda la ruta original para volver después del login
 export const ProtectedRoute = ({ children }) => {
-  const { user, isLoading } = useAuth();
+  const { user } = useAuth()
+  const location = useLocation()
 
-  if (isLoading) return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>Cargando...</div>;
-  if (!user) return <Navigate to="/login" replace />;
+  if (!user) return <Navigate to="/login" replace state={{ from: location }} />
 
-  return children;
-};
+  return children
+}

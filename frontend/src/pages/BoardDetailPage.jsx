@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { boardService } from '../api/boardService';
-import { BoardDetail } from '../features/boards/components/BoardDetail';
 import { Spinner } from '../components/Spinner';
 import { useCreateColumn, useDeleteColumn } from '../features/columns/hooks';
 import { useCreateTicket, useDeleteTicket } from '../features/tickets/hooks';
@@ -25,7 +24,7 @@ const BoardDetailPage = () => {
 
   const { mutate: createColumn } = useCreateColumn(boardId);
   const { mutate: deleteColumn } = useDeleteColumn(boardId);
-  const { mutate: createTicket } = useCreateTicket(boardId); // Necesitará columnId en el call
+  const { mutate: createTicket } = useCreateTicket(boardId);
   const { mutate: deleteTicket } = useDeleteTicket(boardId);
 
   const { register: regCol, handleSubmit: submitCol, reset: resetCol, formState: { errors: errCol } } = useForm({
@@ -112,7 +111,7 @@ const BoardDetailPage = () => {
         <div className={styles.modalOverlay}>
           <div className={styles.modal}>
             <h2>Nuevo Ticket</h2>
-            <form onSubmit={submitTck(handleCreateTicket)} style={{ display: 'flex', flexDirection: 'column', gap: ' ', gap: '1rem' }}>
+            <form onSubmit={submitTck(handleCreateTicket)} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <Input label="Título" {...regTck('title')} error={errTck.title?.message} />
               <Input label="Descripción" {...regTck('description')} />
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>

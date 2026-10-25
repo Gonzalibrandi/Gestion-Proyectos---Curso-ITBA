@@ -2,10 +2,11 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ticketService } from '../../api/ticketService';
 import { toast } from 'sonner';
 
-export const useCreateTicket = (boardId, columnId) => {
+// Los IDs de columna y ticket llegan en las variables de mutate(), no al crear el hook
+export const useCreateTicket = (boardId) => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data) => ticketService.createTicket(boardId, columnId, data),
+    mutationFn: ({ columnId, ...data }) => ticketService.createTicket(boardId, columnId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['board', boardId] });
       toast.success('Ticket creado');
@@ -16,10 +17,10 @@ export const useCreateTicket = (boardId, columnId) => {
   });
 };
 
-export const useUpdateTicket = (boardId, columnId, ticketId) => {
+export const useUpdateTicket = (boardId) => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (changes) => ticketService.updateTicket(boardId, columnId, ticketId, changes),
+    mutationFn: ({ columnId, ticketId, changes }) => ticketService.updateTicket(boardId, columnId, ticketId, changes),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['board', boardId] });
       toast.success('Ticket actualizado');
@@ -30,10 +31,10 @@ export const useUpdateTicket = (boardId, columnId, ticketId) => {
   });
 };
 
-export const useDeleteTicket = (boardId, columnId, ticketId) => {
+export const useDeleteTicket = (boardId) => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: () => ticketService.deleteTicket(boardId, columnId, ticketId),
+    mutationFn: ({ columnId, ticketId }) => ticketService.deleteTicket(boardId, columnId, ticketId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['board', boardId] });
       toast.success('Ticket eliminado');

@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from './ColumnView.module.css';
-import { TicketCard } from '../tickets/components/TicketCard';
+import { TicketCard } from '../../tickets/components/TicketCard';
 
 export const ColumnView = ({ column }) => {
   return (

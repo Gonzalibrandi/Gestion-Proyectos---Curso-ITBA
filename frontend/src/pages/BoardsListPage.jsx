@@ -13,7 +13,7 @@ import { useNavigate } from 'react-router-dom';
 
 const BoardsListPage = () => {
   const [showModal, setShowModal] = useState(false);
-  const { mutate: createBoard, isPending: isCreating } = useCreateBoard();
+  const { mutate: createBoard } = useCreateBoard();
   const { mutate: deleteBoard, isPending: isDeleting } = useDeleteBoard();
   const navigate = useNavigate();
 

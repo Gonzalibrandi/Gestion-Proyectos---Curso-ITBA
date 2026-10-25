@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from './BoardDetail.module.css';
-import { ColumnView } from '../columns/components/ColumnView';
+import { ColumnView } from '../../columns/components/ColumnView';
 
 export const BoardDetail = ({ board }) => {
   return (

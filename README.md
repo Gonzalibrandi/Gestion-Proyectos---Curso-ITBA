@@ -2,6 +2,16 @@
 
 Aplicación de gestión de proyectos al estilo Kanban, organizada como **monorepo**. La API implementa un diseño estricto de rutas anidadas que refleja la relación jerárquica **Padre → Hijo → Nieto**: `Tableros (Boards) → Columnas (Columns) → Tickets`.
 
+## 🌐 Deploy
+
+| Parte | Plataforma | URL |
+|---|---|---|
+| Frontend (SPA) | Vercel | https://gestion-proyectos-curso-itba.vercel.app |
+| Backend (API REST) | Render | https://kanban-api-itba.onrender.com/api ([health check](https://kanban-api-itba.onrender.com/api/health)) |
+| Base de datos | MongoDB Atlas (M0) | — |
+
+> El backend usa el plan gratuito de Render: después de 15 minutos sin uso se suspende, y la primera petición puede tardar ~50 s.
+
 ## Estructura del Monorepo
 
 ```
@@ -225,7 +235,7 @@ El login guarda `userId`, y los IDs que se crean se guardan automáticamente en 
 > - Drag & drop con actualización optimista, con mouse o teclado.
 > - Tema "Minimalismo Developer" light/dark persistente.
 >
-> Pendiente: **7 - despliegue** en Render y Vercel.
+> **7 - Despliegue** completado: frontend en Vercel, backend en Render y base de datos en MongoDB Atlas (ver [Deploy](#-deploy)).
 
 ### Tecnologías Utilizadas
 - **React 19** + **Vite 8** (JavaScript)

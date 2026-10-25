@@ -279,7 +279,7 @@ Cada fase se pide en un prompt separado y se revisa y valida antes de avanzar a 
 | **4. Rutas y Páginas** ✅ | `router.jsx`, `ProtectedRoute`, `AuthContext`, `LoginPage`, `BoardsListPage`, `BoardDetailPage` y `NotFoundPage`, con queries y estados de loading, error y data. | Navegación completa y rutas protegidas. |
 | **5. Formularios y Mutaciones** ✅ | Formularios con React Hook Form + Zod, errores del servidor en los inputs, spinners, confirmaciones y Toasts (§8 y §9.2). | Crear y borrar funciona, y los errores 400 aparecen en el input. |
 | **6. Drag & Drop optimista** ✅ | Mover tickets con `@dnd-kit`, con actualización optimista y rollback (§9.3). | Mover es instantáneo; si se fuerza un error, el ticket vuelve a su columna y aparece el Toast. |
-| **7. Cierre y Despliegue** | Revisar los criterios de aceptación (§14), desplegar backend (Render) y frontend (Vercel) siguiendo §11.2, y actualizar `README.md` y `ARQUITECTURA.md`. | Checklist completo y la app funciona con las URLs públicas. |
+| **7. Cierre y Despliegue** ✅ | Revisar los criterios de aceptación (§14), desplegar backend (Render) y frontend (Vercel) siguiendo §11.2, y actualizar `README.md` y `ARQUITECTURA.md`. | Checklist completo y la app funciona con las URLs públicas. |
 
 ## 14. Criterios de Aceptación
 - [x] Sin sesión, `/boards` y `/boards/:boardId` redirigen a `/login`; después del login, se vuelve a la ruta original.
@@ -295,4 +295,4 @@ Cada fase se pide en un prompt separado y se revisa y valida antes de avanzar a 
 - [x] No hay colores hexadecimales fuera de `tokens.css` ni URLs de la API fuera de `.env`.
 - [x] Con `VITE_USE_MOCKS=true`, la app funciona sin el backend.
 - [x] Ningún componente presentacional importa algo de `src/api` ni usa TanStack Query.
-- [ ] Desplegado en Vercel, recargar cualquier ruta de la SPA funciona y la app se comunica con el backend en Render.
+- [x] Desplegado en Vercel, recargar cualquier ruta de la SPA funciona y la app se comunica con el backend en Render.

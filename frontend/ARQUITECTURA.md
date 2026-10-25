@@ -2,7 +2,7 @@
 
 Este documento explica **cómo se construye la SPA y por qué**: las decisiones de arquitectura, los frameworks y librerías elegidos, las alternativas descartadas y los límites conocidos. Las reglas obligatorias de implementación están en [`requerimientos.md`](requerimientos.md).
 
-> **Estado:** Fases 1 a 6 implementadas y verificadas en el navegador (ver §13). Falta la Fase 7 (despliegue en Vercel y Render).
+> **Estado:** Fases 1 a 7 completadas. La app está desplegada en Vercel (frontend), Render (backend) y MongoDB Atlas, y se verificó de punta a punta en producción (ver §13).
 
 ## 1. Visión General
 
@@ -212,3 +212,12 @@ Cada fase se validó en Edge headless, contra el backend real y contra los mocks
 | 5. Formularios y mutaciones (backend real) | 24 |
 | 6. Drag & drop optimista (backend real) | 10 |
 | Flujo completo solo con mocks, sin backend | 6 |
+
+### Despliegue (Fase 7)
+| Pieza | Configuración |
+|---|---|
+| **Vercel** | Root Directory `frontend`, preset Vite, `VITE_API_URL=https://kanban-api-itba.onrender.com/api` y `VITE_USE_MOCKS=false`. `vercel.json` reescribe las rutas de la SPA a `index.html`. |
+| **Render** | Blueprint `render.yaml`, con `CORS_ORIGIN` igual a la URL de Vercel. Solo ese origen puede llamar a la API desde un navegador. |
+| **MongoDB Atlas** | Usuario de base con permisos mínimos (`readWrite`) y lista de IPs limitada a los rangos de salida de Render. |
+
+**Verificación en producción:** la colección de Postman contra Render pasó completa (42 requests y 77 asserts). En el navegador, contra Vercel, pasaron 11 chequeos: login, crear tablero, columnas y ticket, drag & drop, recarga de una ruta interna con persistencia del movimiento y borrado en cascada. También se comprobó que CORS rechaza otros orígenes.

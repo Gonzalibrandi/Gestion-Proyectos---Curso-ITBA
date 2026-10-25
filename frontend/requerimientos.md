@@ -44,17 +44,21 @@ frontend/
     │   ├── boardService.js
     │   ├── columnService.js
     │   └── ticketService.js
-    ├── components/            # UI reutilizable y agnóstica del dominio (Button, Input, Modal, Spinner, ThemeToggle)
+    ├── components/            # UI reutilizable y agnóstica del dominio (Button, Input, Modal, ConfirmDialog,
+    │                          # Form, Spinner, StateMessage, AppHeader, ThemeToggle)
     ├── features/              # Módulos por dominio
-    │   ├── boards/            # Componentes, hooks de queries/mutations y esquemas Zod de tableros
+    │   ├── auth/              # LoginForm, useLogin y esquema del login
+    │   ├── boards/            # Componentes, hooks de queries/mutations, esquemas Zod y queryKeys.js
     │   ├── columns/
-    │   └── tickets/
-    ├── context/               # ThemeContext y AuthContext (estado global de UI)
-    ├── hooks/                 # Custom hooks transversales (useTheme, useAuth)
+    │   └── tickets/           # Además: priorities.js (valores y etiquetas) y dnd.js (teclado y anuncios del drag & drop)
+    ├── context/               # ThemeContext/ThemeProvider y AuthContext/AuthProvider (estado global de UI)
+    ├── hooks/                 # Custom hooks transversales (useTheme, useAuth, useServerError)
+    ├── utils/                 # Funciones puras transversales (toastApiError)
     ├── mocks/                 # mockData.js (datos), db.js (estado en memoria), rules.js (validaciones del backend),
     │                          # handlers.js (MSW) y browser.js. El worker de MSW vive en public/mockServiceWorker.js
-    ├── pages/                 # Vistas asociadas a rutas (contenedores)
-    ├── routes/                # router.jsx y ProtectedRoute.jsx
+    ├── pages/                 # Vistas asociadas a rutas (contenedores). BoardDetailDialogs.jsx es un contenedor
+    │                          # auxiliar de BoardDetailPage (sus formularios y confirmaciones)
+    ├── routes/                # router.jsx, ProtectedRoute.jsx y AppLayout.jsx (rutas de layout)
     └── styles/                # tokens.css (variables del tema) y global.css (reset y base)
 ```
 
@@ -75,7 +79,10 @@ Convenciones de archivos:
 | **Presentacional** ("tonto") | `components/`, `features/*/components/` | Recibir datos y callbacks por props, renderizar UI y tener estado puramente visual (abierto/cerrado, hover). Los formularios pueden usar `useForm` de React Hook Form. | Usar `useEffect` para traer datos, importar servicios de `src/api`, usar TanStack Query ni navegar. |
 | **Contenedor / Página** | `pages/` | Usar los hooks de `features/*/hooks`, `useParams`, `useNavigate`, mostrar Toasts y pasar datos y callbacks a los presentacionales. | Llamar a Axios directamente: siempre lo hace a través de los hooks y servicios. |
 
-- Los formularios presentacionales reciben por props: `onSubmit`, `isSubmitting` y `serverError` (el mensaje del backend, si lo hubo).
+- Los formularios presentacionales reciben por props: `onSubmit`, `isSubmitting` y `serverError`. `serverError` es el `ApiError` de la mutación (o `null`), no solo el mensaje: así dos fallos seguidos con el mismo texto vuelven a mostrarse. El hook `useServerError` lo asigna al campo con `setError`.
+- Los presentacionales pueden renderizar `<Link>` (navegación declarativa pura, por ejemplo abrir un tablero), pero nunca usar `useNavigate`.
+- Los presentacionales pueden usar los hooks de `@dnd-kit` (`useDraggable`, `useDroppable`), porque son comportamiento de UI. La lógica de qué pasa al soltar vive en la página.
+- Los callbacks de acción son opcionales: si la página no pasa, por ejemplo, `onDelete`, el botón no se muestra.
 - Los componentes se mantienen chicos y con una sola responsabilidad. Si un archivo supera las ~150 líneas, se divide.
 
 ## 5. Matriz de Rutas (SPA)
@@ -212,6 +219,7 @@ Estilo inspirado en IDEs y terminales. Prioriza el contraste y la jerarquía de 
 | `--danger-color` | `#DC2626` | `#F87171` | Derivado (errores y borrados) |
 | `--text-on-accent` | `#FFFFFF` | `#0F172A` | Derivado (texto sobre fondo de acento, con contraste en ambos temas) |
 | `--shadow-card` | sombra mínima | `none` | Derivado (en dark, las tarjetas se separan solo por el borde) |
+| `--overlay-color` | gris oscuro translúcido | negro translúcido | Derivado (fondo detrás de los modales) |
 | `--font-sans` | `system-ui, sans-serif` | (igual) | Texto general |
 | `--font-mono` | `ui-monospace, "Cascadia Code", Consolas, monospace` | (igual) | IDs, contadores y metadatos |
 
@@ -267,24 +275,24 @@ Cada fase se pide en un prompt separado y se revisa y valida antes de avanzar a 
 | **0. Backend** ✅ | Implementar todos los cambios de §7.3 (usuario único y seed, login, `X-User-Id`, `owner`, `GET /api/boards`, `priority`, `DELETE` de tickets, health check y CORS por entorno), además de `render.yaml`: primero las colecciones de prueba y después el código. | Colección completa en verde. |
 | **1. Scaffold** ✅ | Crear el proyecto Vite, instalar el stack (§2), armar la estructura de carpetas (§3), `tokens.css`, `ThemeContext`, script anti-parpadeo, `.env.example` y `vercel.json`. | La app arranca, el interruptor de tema funciona y persiste, y `npm run build` genera `dist/`. |
 | **2. Capa API + Mocks** ✅ | `httpClient.js` (con los dos interceptores), los 4 servicios (§7) y MSW (§11.1). | Con `VITE_USE_MOCKS=true` los servicios responden; contra el backend real, también. |
-| **3. Componentes atómicos** | `components/` y `features/*/components/`: presentacionales puros, sin API ni `useEffect` de datos. | Se renderizan con datos de `mockData.js`. |
-| **4. Rutas y Páginas** | `router.jsx`, `ProtectedRoute`, `AuthContext`, `LoginPage`, `BoardsListPage`, `BoardDetailPage` y `NotFoundPage`, con queries y estados de loading, error y data. | Navegación completa y rutas protegidas. |
-| **5. Formularios y Mutaciones** | Formularios con React Hook Form + Zod, errores del servidor en los inputs, spinners, confirmaciones y Toasts (§8 y §9.2). | Crear y borrar funciona, y los errores 400 aparecen en el input. |
-| **6. Drag & Drop optimista** | Mover tickets con `@dnd-kit`, con actualización optimista y rollback (§9.3). | Mover es instantáneo; si se fuerza un error, el ticket vuelve a su columna y aparece el Toast. |
+| **3. Componentes atómicos** ✅ | `components/` y `features/*/components/`: presentacionales puros, sin API ni `useEffect` de datos. | Se renderizan con datos de `mockData.js`. |
+| **4. Rutas y Páginas** ✅ | `router.jsx`, `ProtectedRoute`, `AuthContext`, `LoginPage`, `BoardsListPage`, `BoardDetailPage` y `NotFoundPage`, con queries y estados de loading, error y data. | Navegación completa y rutas protegidas. |
+| **5. Formularios y Mutaciones** ✅ | Formularios con React Hook Form + Zod, errores del servidor en los inputs, spinners, confirmaciones y Toasts (§8 y §9.2). | Crear y borrar funciona, y los errores 400 aparecen en el input. |
+| **6. Drag & Drop optimista** ✅ | Mover tickets con `@dnd-kit`, con actualización optimista y rollback (§9.3). | Mover es instantáneo; si se fuerza un error, el ticket vuelve a su columna y aparece el Toast. |
 | **7. Cierre y Despliegue** | Revisar los criterios de aceptación (§14), desplegar backend (Render) y frontend (Vercel) siguiendo §11.2, y actualizar `README.md` y `ARQUITECTURA.md`. | Checklist completo y la app funciona con las URLs públicas. |
 
 ## 14. Criterios de Aceptación
-- [ ] Sin sesión, `/boards` y `/boards/:boardId` redirigen a `/login`; después del login, se vuelve a la ruta original.
-- [ ] El login funciona con el usuario único; con credenciales incorrectas, el mensaje del backend aparece en el formulario.
-- [ ] Se pueden listar, crear y eliminar tableros (con confirmación de borrado en cascada), y la lista muestra solo los tableros del usuario.
-- [ ] Cada ticket muestra su prioridad (Baja, Media o Alta), que se puede elegir al crearlo y al editarlo.
-- [ ] El detalle del tablero muestra columnas y tickets anidados, con estados de loading, error y data.
-- [ ] Se pueden crear y eliminar columnas, y crear, editar y eliminar tickets.
-- [ ] Mover un ticket entre columnas se refleja al instante; ante un error, vuelve a su columna y aparece un Toast.
-- [ ] Un `400` del backend se muestra debajo del input correspondiente, sin recargar la página.
-- [ ] Todo botón de mutación se deshabilita y muestra un spinner mientras la petición está en curso.
-- [ ] El tema inicial respeta la preferencia del sistema; la elección manual persiste al recargar y no hay parpadeo.
-- [ ] No hay colores hexadecimales fuera de `tokens.css` ni URLs de la API fuera de `.env`.
-- [ ] Con `VITE_USE_MOCKS=true`, la app funciona sin el backend.
-- [ ] Ningún componente presentacional importa algo de `src/api` ni usa TanStack Query.
+- [x] Sin sesión, `/boards` y `/boards/:boardId` redirigen a `/login`; después del login, se vuelve a la ruta original.
+- [x] El login funciona con el usuario único; con credenciales incorrectas, el mensaje del backend aparece en el formulario.
+- [x] Se pueden listar, crear y eliminar tableros (con confirmación de borrado en cascada), y la lista muestra solo los tableros del usuario.
+- [x] Cada ticket muestra su prioridad (Baja, Media o Alta), que se puede elegir al crearlo y al editarlo.
+- [x] El detalle del tablero muestra columnas y tickets anidados, con estados de loading, error y data.
+- [x] Se pueden crear y eliminar columnas, y crear, editar y eliminar tickets.
+- [x] Mover un ticket entre columnas se refleja al instante; ante un error, vuelve a su columna y aparece un Toast.
+- [x] Un `400` del backend se muestra debajo del input correspondiente, sin recargar la página.
+- [x] Todo botón de mutación se deshabilita y muestra un spinner mientras la petición está en curso.
+- [x] El tema inicial respeta la preferencia del sistema; la elección manual persiste al recargar y no hay parpadeo.
+- [x] No hay colores hexadecimales fuera de `tokens.css` ni URLs de la API fuera de `.env`.
+- [x] Con `VITE_USE_MOCKS=true`, la app funciona sin el backend.
+- [x] Ningún componente presentacional importa algo de `src/api` ni usa TanStack Query.
 - [ ] Desplegado en Vercel, recargar cualquier ruta de la SPA funciona y la app se comunica con el backend en Render.

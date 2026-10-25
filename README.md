@@ -218,7 +218,14 @@ El login guarda `userId`, y los IDs que se crean se guardan automáticamente en 
 
 ## Frontend (SPA)
 
-> **En desarrollo por fases** (ver [`frontend/requerimientos.md`](frontend/requerimientos.md), §13). Completadas: **1 - Scaffold** (proyecto base y tema "Minimalismo Developer" con interruptor light/dark persistente) y **2 - Capa API + Mocks** (servicios con Axios y MSW con las mismas respuestas que el backend).
+> **Fases 1 a 6 completadas** (ver [`frontend/requerimientos.md`](frontend/requerimientos.md), §13). Funcionalidades:
+> - Login del usuario único, con rutas protegidas.
+> - Lista de tableros, con alta y baja.
+> - Tablero Kanban con columnas y tickets: alta, edición, baja y prioridad.
+> - Drag & drop con actualización optimista, con mouse o teclado.
+> - Tema "Minimalismo Developer" light/dark persistente.
+>
+> Pendiente: **7 - despliegue** en Render y Vercel.
 
 ### Tecnologías Utilizadas
 - **React 19** + **Vite 8** (JavaScript)

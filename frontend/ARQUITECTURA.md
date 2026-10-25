@@ -2,7 +2,7 @@
 
 Este documento explica **cómo se construye la SPA y por qué**: las decisiones de arquitectura, los frameworks y librerías elegidos, las alternativas descartadas y los límites conocidos. Las reglas obligatorias de implementación están en [`requerimientos.md`](requerimientos.md).
 
-> **Estado:** Fases 1 (Scaffold) y 2 (Capa API + Mocks) implementadas. El resto del documento describe decisiones ya tomadas para las fases siguientes, y se actualiza en cada fase (ver `requerimientos.md`, §13) si alguna cambia durante el desarrollo.
+> **Estado:** Fases 1 a 6 implementadas y verificadas en el navegador (ver §13). Falta la Fase 7 (despliegue en Vercel y Render).
 
 ## 1. Visión General
 
@@ -172,3 +172,43 @@ Versiones fijadas al crear el proyecto (Fase 1), con la plantilla `react` de `cr
 | `sonner` | 2.0 | — |
 | `msw` | 2.15 (dev) | — |
 | `oxlint` | 1.89 (dev) | — |
+
+## 13. Implementación de las Fases 3 a 6
+
+### Componentes (Fase 3)
+| Decisión | Por qué |
+|---|---|
+| **`Button` con `type="button"` por defecto e `isLoading`** | Un botón dentro de un `<form>` es `submit` por defecto, y un "Cancelar" enviaba el formulario. Con `isLoading` el botón se deshabilita y muestra un spinner, como pide §8, sin repetir esa lógica en cada pantalla. |
+| **`Input` único con `as`** (`input`, `textarea` o `select`) | Un mismo componente asocia el label (`useId`), marca `aria-invalid` y muestra el error con `role="alert"` para cualquier tipo de campo. |
+| **`Modal` y `ConfirmDialog` propios** | Reemplazan a `window.confirm`: se ven con el tema, avisan del borrado en cascada y muestran el spinner mientras se borra. Se cierran con Escape o con un clic fuera del panel. |
+| **`useServerError(serverError, setError, campo)`** | Lleva el `ApiError` de la mutación al campo correspondiente del formulario (el 400 al input, el 401 del login al error general). Recibe el objeto y no el mensaje, para que un segundo fallo idéntico también se muestre. |
+| **Callbacks opcionales** | Un componente solo muestra un botón si la página le pasa la acción. Así el mismo `TicketCard` sirve en el tablero y en el `DragOverlay`. |
+| **Esquemas Zod por dominio** (`features/<dominio>/schemas.js`) | Cada esquema vive junto a su formulario. El login se separó en `features/auth`. |
+
+### Rutas y sesión (Fase 4)
+- `ProtectedRoute` y `AppLayout` son **rutas de layout** (`<Outlet />`): el header con el usuario, el tema y el cierre de sesión se escribe una sola vez para todas las páginas protegidas.
+- `AuthProvider` registra el callback de `setUnauthorizedHandler`: ante un 401 de una sesión vieja limpia la caché, borra el usuario y avisa con un Toast. `ProtectedRoute` lleva a `/login` y guarda la ruta original.
+- El login también pasa por TanStack Query (`useLogin`), como toda mutación.
+- `QueryClient` solo reintenta las fallas de red y los 5xx: reintentar un 400 o un 404 no cambia el resultado.
+
+### Mutaciones (Fase 5)
+- Los hooks de mutación solo invalidan la query afectada. Los Toasts y la navegación los decide la página, porque dependen del contexto (por ejemplo, después de crear un tablero se navega a él).
+- `toastApiError(error, [400])` centraliza la regla: los códigos que el formulario ya muestra no se repiten en un Toast, y el 401 lo maneja `AuthProvider`.
+- `BoardDetailDialogs` agrupa los seis flujos de diálogo del detalle (crear y eliminar columna, crear, editar y eliminar ticket, eliminar tablero), para que `BoardDetailPage` no pase las ~150 líneas.
+
+### Drag & drop (Fase 6)
+- **`useMoveTicket`:** `onMutate` mueve el ticket en la caché, `onError` restaura la copia y avisa, y `onSettled` resincroniza. La URL del `PATCH` usa la columna de origen, y el backend es idempotente si se reintenta.
+- **Mouse:** se arrastra desde cualquier parte de la tarjeta. `PointerSensor` se activa recién a los 5 px, así los botones "Editar" y "Eliminar" siguen funcionando con un clic.
+- **Teclado:** la manija (⠿) es el activador accesible. Con Espacio o Enter se toma el ticket, y `columnKeyboardCoordinates` hace que las flechas izquierda y derecha salten al centro de la columna vecina. Los anuncios para lectores de pantalla están en español.
+- **`DragOverlay`:** la copia que se arrastra flota por encima de todo, así no la recorta el scroll horizontal del tablero.
+
+### Verificación
+Cada fase se validó en Edge headless, contra el backend real y contra los mocks. Los errores 400, 404 y 500 y las demoras se forzaron interceptando peticiones:
+
+| Fase | Chequeos |
+|---|---|
+| 3. Componentes con `mockData` | 14 |
+| 4. Rutas, sesión y estados | 18 |
+| 5. Formularios y mutaciones (backend real) | 24 |
+| 6. Drag & drop optimista (backend real) | 10 |
+| Flujo completo solo con mocks, sin backend | 6 |

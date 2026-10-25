@@ -1,6 +1,6 @@
-import React from 'react';
-import styles from './Spinner.module.css';
+import styles from './Spinner.module.css'
 
-export const Spinner = () => {
-  return <div className={styles.spinner} />;
-};
+// Indicador de carga. Toma el color del texto que lo rodea (currentColor)
+export function Spinner({ size = 'md', label = 'Cargando' }) {
+  return <span className={`${styles.spinner} ${styles[size]}`} role="status" aria-label={label} />
+}

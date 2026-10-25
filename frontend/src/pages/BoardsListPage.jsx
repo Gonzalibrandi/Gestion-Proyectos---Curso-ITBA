@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { boardSchema } from '../features/tickets/schemas';
+import { boardSchema } from '../features/boards/schemas';
 import { useCreateBoard, useDeleteBoard } from '../features/boards/hooks';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';

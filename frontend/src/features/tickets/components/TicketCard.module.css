@@ -1,35 +1,68 @@
 .card {
-  background-color: var(--bg-card);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
-  padding: var(--space-3);
-  margin-bottom: var(--space-2);
+  background-color: var(--bg-card);
   box-shadow: var(--shadow-card);
 }
 
 .header {
   display: flex;
-  justify-content: space-between;
   align-items: flex-start;
+  justify-content: space-between;
   gap: var(--space-2);
-  margin-bottom: var(--space-2);
 }
 
 .title {
-  font-weight: 500;
-  color: var(--text-primary);
   font-size: 0.9375rem;
+  font-weight: 500;
+  overflow-wrap: anywhere;
 }
 
 .priority {
+  flex-shrink: 0;
+  padding: 0 var(--space-1);
+  border: 1px solid currentColor;
+  border-radius: var(--radius-sm);
   font-family: var(--font-mono);
-  font-size: 0.75rem;
-  font-weight: 700;
+  font-size: 0.6875rem;
   text-transform: uppercase;
 }
 
-.description {
-  font-size: 0.875rem;
+/* Prioridad con tokens existentes (requerimientos.md §10.1) */
+.low {
   color: var(--text-secondary);
-  margin: 0;
+}
+
+.medium {
+  color: var(--accent-color);
+}
+
+.high {
+  color: var(--danger-color);
+}
+
+.description {
+  color: var(--text-secondary);
+  font-size: 0.8125rem;
+  overflow-wrap: anywhere;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.id {
+  color: var(--text-secondary);
+  font-size: 0.6875rem;
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-1);
 }

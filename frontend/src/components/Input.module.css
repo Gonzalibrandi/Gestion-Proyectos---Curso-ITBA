@@ -5,26 +5,32 @@
 }
 
 .label {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
+  font-size: 0.8125rem;
   font-weight: 500;
+  color: var(--text-secondary);
 }
 
-.input {
+.field {
+  width: 100%;
   padding: var(--space-2);
-  border-radius: var(--radius-sm);
   border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
   background-color: var(--bg-card);
   color: var(--text-primary);
   font-family: var(--font-sans);
+  font-size: 0.875rem;
 }
 
-.input:focus {
+textarea.field {
+  resize: vertical;
+}
+
+.field:focus {
   outline: none;
   border-color: var(--accent-color);
 }
 
-.input.error {
+.invalid {
   border-color: var(--danger-color);
 }
 

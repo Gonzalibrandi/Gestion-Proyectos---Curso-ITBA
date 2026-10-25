@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { loginSchema } from '../features/tickets/schemas';
+import { loginSchema } from '../features/auth/schemas';
 import { useAuth } from '../hooks/useAuth';
 import { authService } from '../api/authService';
 import { toast } from 'sonner';

@@ -1,25 +1,31 @@
-import React from 'react';
-import styles from './TicketCard.module.css';
+import { Button } from '../../../components/Button'
+import { PRIORITY_LABELS } from '../priorities'
+import styles from './TicketCard.module.css'
 
-export const TicketCard = ({ ticket }) => {
-  const priorityColors = {
-    low: 'var(--text-secondary)',
-    medium: 'var(--accent-color)',
-    high: 'var(--danger-color)',
-  };
+// Tarjeta de ticket (presentacional): sin useEffect ni llamadas a la API
+export function TicketCard({ ticket, onEdit, onDelete }) {
+  const priority = PRIORITY_LABELS[ticket.priority] ? ticket.priority : 'medium'
 
   return (
-    <div className={styles.card}>
-      <div className={styles.header}>
-        <span className={styles.title}>{ticket.title}</span>
-        <span
-          className={styles.priority}
-          style={{ color: priorityColors[ticket.priority] || priorityColors.medium }}
-        >
-          {ticket.priority === 'low' ? 'Baja' : ticket.priority === 'medium' ? 'Media' : 'Alta'}
-        </span>
-      </div>
+    <article className={styles.card}>
+      <header className={styles.header}>
+        <h4 className={styles.title}>{ticket.title}</h4>
+        <span className={`${styles.priority} ${styles[priority]}`}>{PRIORITY_LABELS[priority]}</span>
+      </header>
+
       {ticket.description && <p className={styles.description}>{ticket.description}</p>}
-    </div>
-  );
-};
+
+      <footer className={styles.footer}>
+        <code className={styles.id}>#{ticket._id.slice(-6)}</code>
+        <div className={styles.actions}>
+          <Button variant="ghost" size="sm" onClick={() => onEdit(ticket)} aria-label={`Editar ${ticket.title}`}>
+            Editar
+          </Button>
+          <Button variant="ghost" size="sm" onClick={() => onDelete(ticket)} aria-label={`Eliminar ${ticket.title}`}>
+            Eliminar
+          </Button>
+        </div>
+      </footer>
+    </article>
+  )
+}

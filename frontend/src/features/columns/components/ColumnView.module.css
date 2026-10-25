@@ -1,9 +1,10 @@
 .column {
   display: flex;
   flex-direction: column;
-  flex-shrink: 0;
+  /* Las columnas se reparten el ancho disponible; con muchas columnas, el tablero hace scroll horizontal */
+  flex: 1 1 0;
+  min-width: 260px;
   gap: var(--space-3);
-  width: 280px;
   padding: var(--space-3);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
